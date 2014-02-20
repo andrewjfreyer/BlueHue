@@ -16,10 +16,18 @@ source /home/pi/hue/hue_bashlibrary.sh
 # Credential Information
 # ----------------------------------------------------------------------------------------
 
-devicetype=$(cat hue_credentials | awk '{print $1}')							
-username=$(cat hue_credentials | awk '{print $2}')
-DefaultMacAddress=00:00:00:00:00:00
-DeviceName="iPhone"
+credentials=$(cat hue_credentials)
+
+devicetype=$(echo "$credentials" | awk '{print $1}')							
+username=$(echo "$credentials" | awk '{print $2}')
+DefaultMacAddress=$(echo "$credentials" | awk '{print $3}')
+DeviceName=$(echo "$credentials" | awk '{print $4}')
+
+#Error; One or more credentials is not found
+if [ -z $devicetype ] ||  [ -z $username ] || [ -z $DefaultMacAddress ] || [ -z $DeviceName ]; then 
+	echo "hue_credentials usage: devicetype username mac devicename"
+	exit 1
+fi 
 
 # ----------------------------------------------------------------------------------------
 # SOURCE VARIABLES FOR HUE API
