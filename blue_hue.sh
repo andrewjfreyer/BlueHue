@@ -122,7 +122,7 @@ function hue_allon_custom () {
 # ----------------------------------------------------------------------------------------
 
 function notifyViaPushover () {
-	if  [ ! -z $PushoverUserKey ]; then 
+	if [ ! -z $PushoverUserKey ] && [ ! -z $PushoverToken ];then 
 		curl -s \
 			-F "token=$PushoverToken" \
 			-F "user=$PushoverUserKey" \
