@@ -23,6 +23,10 @@ username=$(echo "$credentials" | awk '{print $2}')
 DefaultMacAddress=$(echo "$credentials" | awk '{print $3}')
 DeviceName=$(echo "$credentials" | awk '{print $4}')
 
+#Optional:
+PushoverUserKey=$(echo "$credentials" | awk '{print $5}')
+PushoverToken=$(echo "$credentials" | awk '{print $6}')
+
 #Error; One or more credentials is not found
 if [ -z $devicetype ] ||  [ -z $username ] || [ -z $DefaultMacAddress ] || [ -z $DeviceName ]; then 
 	echo "hue_credentials usage: devicetype username mac devicename"
@@ -99,12 +103,12 @@ function hue_allon_custom () {
 		sat=225
 	elif ((21<=hour && hour<=23)); then
 	    	#night -> cool (blue) white light; moon
-	    	bri=160
+		bri=160
 		hue=46920
 		sat=255
 	elif ((0<=hour && hour<=3)); then
 	    	#late night -> cool (blue) white light; dim moon
-	    	bri=130
+		bri=130
 		hue=46920
 		sat=255
 	fi
@@ -118,11 +122,13 @@ function hue_allon_custom () {
 # ----------------------------------------------------------------------------------------
 
 function notifyViaPushover () {
-	curl -s \
-		-F "token=" \
-		-F "user=" \
-		-F "message=$1" \
-		"https://api.pushover.net/1/messages.json"
+	if  [ ! -z $PushoverUserKey ]; then 
+		curl -s \
+			-F "token=$PushoverToken" \
+			-F "user=$PushoverUserKey" \
+			-F "message=$1" \
+			"https://api.pushover.net/1/messages.json"
+	fi
 }
 
 # ----------------------------------------------------------------------------------------
