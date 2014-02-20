@@ -64,7 +64,7 @@ function hue_allon_custom () {
 		hue=65535
 		sat=25
 	elif ((11<=hour && hour<=13)); then
-	    #noon  -> white
+	    	#noon  -> white
 		bri=255
 		hue=0
 		sat=0
@@ -74,18 +74,18 @@ function hue_allon_custom () {
 		hue=46920
 		sat=25
 	elif ((17<=hour && hour<=21)); then
-	    #evening -> cool (blue) white light
-	    bri=180
+	    	#evening -> cool (blue) white light
+	    	bri=180
 		hue=46920
 		sat=225
 	elif ((21<=hour && hour<=23)); then
-	    #night -> cool (blue) white light; moon
-	    bri=160
+	    	#night -> cool (blue) white light; moon
+	    	bri=160
 		hue=46920
 		sat=255
 	elif ((0<=hour && hour<=3)); then
-	    #late night -> cool (blue) white light; dim moon
-	    bri=130
+	    	#late night -> cool (blue) white light; dim moon
+	    	bri=130
 		hue=46920
 		sat=255
 	fi
