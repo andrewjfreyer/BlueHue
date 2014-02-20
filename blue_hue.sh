@@ -11,7 +11,7 @@
 # ----------------------------------------------------------------------------------------
 
 source /home/pi/hue/hue_bashlibrary.sh
-devicetype='api'							
+devicetype='yourdevicetype'							
 username='yourusernamehere'
 loglevel=0
 laststatus=99
@@ -29,8 +29,10 @@ if [ -z "$ipaddress" ]; then
 fi
 
 # ----------------------------------------------------------------------------------------
-# DEFAULTS WAIT SETTINGS
+# DEFAULTS
 # ----------------------------------------------------------------------------------------
+DefaultMacAddress=00:00:00:00:00:00
+DeviceName="iPhone"
 
 DefaultWaitWhilePresent=25
 DefaultWaitWhileAbsent=10
@@ -113,8 +115,8 @@ notifyViaPushover "Rebooted."
 while ($1); do
 	for repetition in $(seq 1 $DefaultRepeatSequence); 
 	do 
-		ScanResult=$(hcitool name 0C:3E:9F:54:FD:DC 2>&1)
-		iPhonePresent=$(echo "$ScanResult" | grep -ic "iPhone")
+		ScanResult=$(hcitool name "$DefaultMacAddress" 2>&1)
+		iPhonePresent=$(echo "$ScanResult" | grep -ic "$DeviceName")
 
 		if [ "$ScanResult" == "" ]; then
 			if [ "$laststatus" != 0 ]; then  
