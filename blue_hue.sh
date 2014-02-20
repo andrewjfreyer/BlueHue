@@ -12,7 +12,7 @@
 
 source /home/pi/hue/hue_bashlibrary.sh
 devicetype='api'							
-username='andrewjfreyer'
+username='yourusernamehere'
 loglevel=0
 laststatus=99
 
