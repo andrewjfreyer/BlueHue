@@ -98,8 +98,8 @@ function hue_allon_custom () {
 
 function notifyViaPushover () {
 	curl -s \
-		-F "token=a3TSgQQx3xvNZ9mJCJ1wjfmegt8JCZ" \
-		-F "user=oMpBEUgLL5djk8D0RqB4HB1TeqyzFz" \
+		-F "token=" \
+		-F "user=" \
 		-F "message=$1" \
 		"https://api.pushover.net/1/messages.json"
 }
