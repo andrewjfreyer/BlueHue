@@ -10,7 +10,7 @@ Bluetooth Proximity Switch for Activiating [Philips Hue Lights](http://meethue.c
 
 <h2>TL;DR</h2>
 
-Turn Hue lights on when upon arriving home and turn Hue lights off upon leaving without the delays of IFTTT or inaccuracies and battery drain associated with GeoFencing via the [Philips Hue app](https://itunes.apple.com/us/app/philips-hue/id557206189?mt=8). 
+Turn [Philips Hue lights](http://www.meethue.com) on when upon arriving home and turn Hue lights off upon leaving without the delays of IFTTT or inaccuracies and battery drain associated with GeoFencing via the [Philips Hue app](https://itunes.apple.com/us/app/philips-hue/id557206189?mt=8). 
 
 <h2>Summary</h2>
 
