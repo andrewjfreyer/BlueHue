@@ -4,10 +4,11 @@ BlueHue
 Bluetooth Proximity Switch for Activiating Hue Lights
 
 * Designed around [hcitool](http://linuxcommand.org/man_pages/hcitool1.html)
-* Does not re-set lighting changes made via app until bluetooth proximity state changes
+* Does not re-set light state/color changes made with App until bluetooth proximity state changes
 * Bluetooth queries are efficient so as to not impact portable device battery
+* Designed for [Raspberry Pi](http://www.raspberrypi.org/) with a cheap [Bluetooth Dongle](http://www.amazon.com/SANOXY%C2%AE-Bluetooth-Wireless-Adapter-eMachine/dp/B003VWU79I/ref=pd_sim_pc_1?ie=UTF8&refRID=16KWQH2VYRTN82GTNS70). 
 
-<h1>Instructions (Debian):</h1>
+<h2>Installation Instructions (Debian):</h2>
 
 1. Install Bluetooth/Bluez
   
