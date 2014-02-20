@@ -1,12 +1,16 @@
 BlueHue
 =======
 
-Bluetooth Proximity Switch for Activiating Hue Lights
+Bluetooth Proximity Switch for Activiating [Philips Hue Lights](http://meethue.com/)
 
 * Designed around [hcitool](http://linuxcommand.org/man_pages/hcitool1.html)
 * Designed for [Raspberry Pi](http://www.raspberrypi.org/) with a cheap [Bluetooth Dongle](http://www.amazon.com/SANOXY%C2%AE-Bluetooth-Wireless-Adapter-eMachine/dp/B003VWU79I/ref=pd_sim_pc_1?ie=UTF8&refRID=16KWQH2VYRTN82GTNS70). 
 * Does not re-set light state/color changes made with App until bluetooth proximity state changes
 * Bluetooth queries are efficient so as to not impact portable device battery
+
+<h2>TL;DR</h2>
+
+Turn Hue lights on when upon arriving home and turn Hue lights off upon leaving without the delays of IFTTT or inaccuracies and battery drain associated with GeoFencing via the [Philips Hue app](https://itunes.apple.com/us/app/philips-hue/id557206189?mt=8). 
 
 <h2>Summary</h2>
 
