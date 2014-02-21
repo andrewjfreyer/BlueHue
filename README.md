@@ -9,6 +9,8 @@ Bluetooth Proximity Switch for Activiating [Philips Hue Lights](http://meethue.c
 * Bluetooth queries are efficient so as to not impact portable device battery
 * Works with [PushOver](http://www.pushover.net) service for alerts & notifications
 
+Based on a slightly modified [hue_bashlibrary](https://github.com/markusproske/hue_bashlibrary) by [markusproske](https://github.com/markusproske)
+
 <h2>TL;DR</h2>
 
 Turn [Philips Hue lights](http://www.meethue.com) on with a [Raspberry Pi](http://www.raspberrypi.org/) (or other server) upon arriving home and off upon leaving without the delays of IFTTT or inaccuracies and battery drain associated with geofencing via the [Philips Hue app](https://itunes.apple.com/us/app/philips-hue/id557206189?mt=8). 
@@ -25,19 +27,25 @@ Turn [Philips Hue lights](http://www.meethue.com) on with a [Raspberry Pi](http:
 
 <h2>Installation Instructions (Debian):</h2>
 
-1. Install Bluetooth/Bluez
+1. Add user & connect to Philips Hue Bridge
+
+   Instructions [here](http://developers.meethue.com/4_configurationapi.html#41_create_user).  Clip API is often the easiest way to send this first instruction:
+
+  `http://<bridge ip address>/debug/clip.html`
+
+2. Install Bluetooth/Bluez
   
   `sudo apt-get install bluetooth bluez-utils blueman`
  
-2. Discover mac address of Portable Bluetooth Device (*Note:* skip to 3 if MAC is known)
+3. Discover mac address of Portable Bluetooth Device (*Note:* skip to 3 if MAC is known)
   
   `hcitool scan`
 
-3. Connect the Portable Bluetooth Device to the server running BlueHue, choosing a pin number:
+4. Connect the Portable Bluetooth Device to the server running BlueHue, choosing a pin number:
 
     `sudo bluetooth-agent {PIN NUMBER} {MAC ADDRESS}`
 
-4. Add init.d
+5. Add init.d
 
   `sudo echo “bash /home/pi/hue/blue_hue.sh true &” > /etc/init.d/bluehue`
   
@@ -45,13 +53,17 @@ Turn [Philips Hue lights](http://www.meethue.com) on with a [Raspberry Pi](http:
   
   `sudo update-rc.d bluehue defaults`
   
-5. Add information to Credentials file
+6. Add information to Credentials file
 
   `echo "device_type username mac_address bluetooth_name [pushover_user] [pushover_token]" > hue_credentials`
 
-6. Reboot or Launch
+7. Reboot or Launch
 
   `sudo /etc/init.d/bluehue`
+
+
+
+
 
 
 
