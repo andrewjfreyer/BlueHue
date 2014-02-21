@@ -41,6 +41,13 @@ Turn [Philips Hue lights](http://www.meethue.com) on with a [Raspberry Pi](http:
   
   `hcitool scan`
 
+3. Change the Bluetooth name (optional)
+
+  `sudo nano /etc/bluetooth/main.conf`
+
+  `Name = "BlueHueProximity"`
+
+
 4. Connect the Portable Bluetooth Device to the server running BlueHue, choosing a pin number:
 
     `sudo bluetooth-agent {PIN NUMBER} {MAC ADDRESS}`
