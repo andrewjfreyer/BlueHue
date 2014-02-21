@@ -8,8 +8,8 @@
 credentials=$(cat /home/pi/hue/hue_credentials)
 
 #Download the credentials 
-$PushoverToken=$(echo "$credentials" | awk '{print $5}')
-$PushoverUserKey=$(echo "$credentials" | awk '{print $4}')
+PushoverToken=$(echo "$credentials" | awk '{print $6}')
+PushoverUserKey=$(echo "$credentials" | awk '{print $5}')
 
 function notifyViaPushover () {
 	if [ ! -z $PushoverUserKey ] && [ ! -z $PushoverToken ];then 
