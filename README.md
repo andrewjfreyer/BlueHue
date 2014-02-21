@@ -45,7 +45,11 @@ Turn [Philips Hue lights](http://www.meethue.com) on with a [Raspberry Pi](http:
   
   `sudo update-rc.d bluehue defaults`
   
-5. Reboot or Launch
+5. Add information to Credentials file
+
+  `echo "device_type username mac_address bluetooth_name [pushover_user] [pushover_token]" > hue_credentials`
+
+6. Reboot or Launch
 
   `sudo /etc/init.d/bluehue`
 
