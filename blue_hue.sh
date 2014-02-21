@@ -4,7 +4,7 @@
 # ----------------------------------------------------------------------------------------
 
 # Written by Andrew J Freyer
-# Version 1.2.002
+# Version 1.2.003
 
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE & VAR SETTING
@@ -17,7 +17,7 @@ NOTIFICATIONSOURCE=/home/pi/hue/notification.sh ; [ -f $NOTIFICATIONSOURCE ] && 
 # Credential Information
 # ----------------------------------------------------------------------------------------
 
-credentials=$(cat hue_credentials)
+credentials=$(cat /home/pi/hue/hue_credentials)
 
 devicetype=$(echo "$credentials" | awk '{print $1}')							
 username=$(echo "$credentials" | awk '{print $2}')

@@ -4,8 +4,12 @@
 # NOFIFCATION FUNCTION
 # ----------------------------------------------------------------------------------------
 
-$PushoverToken=EnterYourPushoverToken
-$PushoverUserKey=EnterYourPushoverUserKey
+#Load the credential pages again
+credentials=$(cat /home/pi/hue/hue_credentials)
+
+#Download the credentials 
+$PushoverToken=$(echo "$credentials" | awk '{print $5}')
+$PushoverUserKey=$(echo "$credentials" | awk '{print $4}')
 
 function notifyViaPushover () {
 	if [ ! -z $PushoverUserKey ] && [ ! -z $PushoverToken ];then 
