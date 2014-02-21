@@ -5,7 +5,7 @@
 # ----------------------------------------------------------------------------------------
 
 #Load the credential pages again
-credentials=$(cat /home/pi/hue/notification_credentials)
+credentials=$(cat /home/pi/hue/support/notification_credentials)
 
 #Download the credentials 
 PushoverToken=$(echo "$credentials" | awk '{print $2}')

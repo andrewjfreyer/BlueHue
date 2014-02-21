@@ -10,14 +10,15 @@
 # BASH API / NOTIFICATION API INCLUDE & VAR SETTING
 # ----------------------------------------------------------------------------------------
 
-source /home/pi/hue/hue_bashlibrary.sh
-NOTIFICATIONSOURCE=/home/pi/hue/notification.sh ; [ -f $NOTIFICATIONSOURCE ] && source $NOTIFICATIONSOURCE
+source /home/pi/hue/support/hue_bashlibrary.sh
+source /home/pi/hue/support/discover.sh
+NOTIFICATIONSOURCE=/home/pi/hue/support/notification.sh ; [ -f $NOTIFICATIONSOURCE ] && source $NOTIFICATIONSOURCE
 
 # ----------------------------------------------------------------------------------------
 # Credential Information
 # ----------------------------------------------------------------------------------------
 
-credentials=$(cat /home/pi/hue/hue_credentials)
+credentials=$(cat /home/pi/hue/support/hue_credentials)
 devicetype=$(echo "$credentials" | awk '{print $1}')							
 username=$(echo "$credentials" | awk '{print $2}')
 DefaultMacAddress=$(echo "$credentials" | awk '{print $3}')
@@ -42,11 +43,11 @@ laststatus=99
 # ----------------------------------------------------------------------------------------
 
 #Find the IP Address of the Bridge
-ip=$(cat /home/pi/hue/hue_ip)
+ip=$(cat /home/pi/hue/support/hue_ip)
 
 if [ -z "$ipaddress" ]; then 
 	ip=$(curl -s http://www.meethue.com/api/nupnp | grep -ioE "[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}")
-	echo "$ip" > /home/pi/hue/hue_ip
+	echo "$ip" > /home/pi/hue/support/hue_ip
 fi
 
 # ----------------------------------------------------------------------------------------
