@@ -83,7 +83,7 @@ function hue_allon_custom () {
 		hue=65535
 		sat=25
 	elif ((11<=hour && hour<=13)); then
-	    	#noon  -> white
+	    #noon  -> white
 		bri=255
 		hue=0
 		sat=0
@@ -94,7 +94,7 @@ function hue_allon_custom () {
 		sat=25
 	elif ((17<=hour && hour<=21)); then
 	    	#evening -> cool (blue) white light
-	    	bri=180
+	    bri=180
 		hue=46920
 		sat=225
 	elif ((21<=hour && hour<=23)); then
@@ -109,6 +109,7 @@ function hue_allon_custom () {
 		sat=255
 	fi
 
+	#by default all lights will be turned on or off (i.e., group0)
 	hue_allon $hue $sat $bri
 }
 
@@ -117,7 +118,7 @@ function hue_allon_custom () {
 # INFINITE LOOP
 # ----------------------------------------------------------------------------------------
 
-notifyViaPushover "Rebooted."
+[ -f $NOTIFICATIONSOURCE ] && notifyViaPushover "Rebooted."
 
 while ($1); do
 	for repetition in $(seq 1 $DefaultRepeatSequence); 
