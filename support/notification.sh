@@ -1,8 +1,10 @@
 #!/bin/bash
 
 # ----------------------------------------------------------------------------------------
-# NOFIFCATION FUNCTION
+# VERSION INFORMATION
 # ----------------------------------------------------------------------------------------
+
+# Written by Andrew J Freyer
 
 #Load the credential pages again
 credentials=$(cat /home/pi/hue/support/notification_credentials)

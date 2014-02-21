@@ -5,18 +5,6 @@
 # ----------------------------------------------------------------------------------------
 
 # Written by Andrew J Freyer
-# Version 1.2.003
-
-# ----------------------------------------------------------------------------------------
-# Check Root
-# ----------------------------------------------------------------------------------------
-
-if [[ $EUID -ne 0 ]]; then
-	echo "BlueHue: Must be a root user for setup" 2>&1
-	exit 1
-else
-	echo "Running as root."
-fi
 
 # ----------------------------------------------------------------------------------------
 # Scanning for Local Devices in Discoverable Mode & Automatically Joining
@@ -26,6 +14,15 @@ function discover () {
 	#Replace with your device and username
 	DeviceType="api"
 	Username="andrewjfreyer"
+
+	# Check Root
+
+	if [[ $EUID -ne 0 ]]; then
+		echo "BlueHue: Must be a root user for setup" 2>&1
+		exit 1
+	else
+		echo "Running as root."
+	fi
 	
 	#Mac Addresse
 	MacAddressesOfBluetoothDevicesNearby=$(hcitool scan | grep -ioE "[0-9]:[0-9]:[0-9]:[0-9]:[0-9]:[0-9]")
