@@ -4,13 +4,14 @@
 # ----------------------------------------------------------------------------------------
 
 # Written by Andrew J Freyer
-# Version 1.2.001
+# Version 1.2.002
 
 # ----------------------------------------------------------------------------------------
-# BASH API INCLUDE & VAR SETTING
+# BASH API / NOTIFICATION API INCLUDE & VAR SETTING
 # ----------------------------------------------------------------------------------------
 
 source /home/pi/hue/hue_bashlibrary.sh
+NOTIFICATIONSOURCE=/home/pi/hue/notification.sh ; [ -f $NOTIFICATIONSOURCE ] && source $NOTIFICATIONSOURCE
 
 # ----------------------------------------------------------------------------------------
 # Credential Information
@@ -22,10 +23,6 @@ devicetype=$(echo "$credentials" | awk '{print $1}')
 username=$(echo "$credentials" | awk '{print $2}')
 DefaultMacAddress=$(echo "$credentials" | awk '{print $3}')
 DeviceName=$(echo "$credentials" | awk '{print $4}')
-
-#Optional:
-PushoverUserKey=$(echo "$credentials" | awk '{print $5}')
-PushoverToken=$(echo "$credentials" | awk '{print $6}')
 
 #Error; One or more credentials is not found
 if [ -z $devicetype ] ||  [ -z $username ] || [ -z $DefaultMacAddress ] || [ -z $DeviceName ]; then 
@@ -55,7 +52,6 @@ fi
 # ----------------------------------------------------------------------------------------
 # DEFAULTS
 # ----------------------------------------------------------------------------------------
-
 
 DefaultWaitWhilePresent=25
 DefaultWaitWhileAbsent=10
@@ -118,20 +114,6 @@ function hue_allon_custom () {
 
 
 # ----------------------------------------------------------------------------------------
-# NOFIFCATION FUNCTION
-# ----------------------------------------------------------------------------------------
-
-function notifyViaPushover () {
-	if [ ! -z $PushoverUserKey ] && [ ! -z $PushoverToken ];then 
-		curl -s \
-			-F "token=$PushoverToken" \
-			-F "user=$PushoverUserKey" \
-			-F "message=$1" \
-			"https://api.pushover.net/1/messages.json"
-	fi
-}
-
-# ----------------------------------------------------------------------------------------
 # INFINITE LOOP
 # ----------------------------------------------------------------------------------------
 
@@ -147,7 +129,7 @@ while ($1); do
 			if [ "$laststatus" != 0 ]; then  
 				if [ "$repetition" -eq $DefaultRepeatSequence ] ; then 
 					#iPhone left
-					notifyViaPushover "All lights have been turned off."
+					[ -f $NOTIFICATIONSOURCE ] && notifyViaPushover "All lights have been turned off."
 					hue_alloff
 					laststatus=0
 					DefaultWait=$DefaultWaitWhileAbsent
@@ -163,7 +145,7 @@ while ($1); do
 		elif [ "$iPhonePresent" == "1" ]; then 
 			if [ "$laststatus" != 1 ]; then  
 				#iPhone arrived
-				notifyViaPushover "All lights have been turned on."
+				[ -f $NOTIFICATIONSOURCE ] && notifyViaPushover "All lights have been turned on."
 				hue_allon_custom
 				laststatus=1
 			else
