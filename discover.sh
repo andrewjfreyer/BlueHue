@@ -23,8 +23,10 @@ fi
 # ----------------------------------------------------------------------------------------
 
 function discover () {
+	#Replace with your device and username
 	DeviceType="api"
 	Username="andrewjfreyer"
+	
 	#Mac Addresse
 	MacAddressesOfBluetoothDevicesNearby=$(hcitool scan | grep -ioE "[0-9]:[0-9]:[0-9]:[0-9]:[0-9]:[0-9]")
 
