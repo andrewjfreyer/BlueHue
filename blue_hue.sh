@@ -68,6 +68,7 @@ function hue_allon_custom () {
 	bri=0 #0 - 255
 	hue=0 #0 - 65535
 	sat=0 #0 - 255
+        transition=10
 
 	hour=$(date "+%H")
 
@@ -109,7 +110,7 @@ function hue_allon_custom () {
 	fi
 
 	#by default all lights will be turned on or off (i.e., group0)
-	hue_allon $hue $sat $bri
+	hue_allon $hue $sat $bri $transition
 }
 
 
