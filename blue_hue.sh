@@ -117,7 +117,7 @@ function hue_allon_custom () {
 # INFINITE LOOP
 # ----------------------------------------------------------------------------------------
 
-[ -f $NOTIFICATIONSOURCE ] && notifyViaPushover "Rebooted."
+[ -f $NOTIFICATIONSOURCE ] && notifyViaPushover "BlueHue Proxmity Started."
 
 while ($1); do
 	for repetition in $(seq 1 $DefaultRepeatSequence); 
