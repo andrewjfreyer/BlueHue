@@ -11,7 +11,6 @@
 # ----------------------------------------------------------------------------------------
 
 source /home/pi/hue/support/hue_bashlibrary.sh
-source /home/pi/hue/support/discover.sh
 NOTIFICATIONSOURCE=/home/pi/hue/support/notification.sh ; [ -f $NOTIFICATIONSOURCE ] && source $NOTIFICATIONSOURCE
 
 # ----------------------------------------------------------------------------------------
@@ -27,7 +26,6 @@ DeviceName=$(echo "$credentials" | awk '{print $4}')
 #Error; One or more credentials is not found
 if [ -z $devicetype ] ||  [ -z $username ] || [ -z $DefaultMacAddress ] || [ -z $DeviceName ]; then 
 	echo "hue_credentials usage: devicetype username mac devicename"
-	discover
 	exit 1
 fi 
 
