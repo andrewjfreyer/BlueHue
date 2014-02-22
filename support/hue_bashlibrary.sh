@@ -244,7 +244,7 @@ function hue_alloff {
 
 function hue_allon {
 	if [ ! -z $1 ] && [ ! -z $2 ] && [ ! -z $3 ]; then 
- 		hue_put "{ \"on\": true, \"hue\": $1, \"sat\": $2, \"bri\": $3 }" "groups/0/action"
+ 		hue_put "{ \"on\": true, \"hue\": $1, \"sat\": $2, \"bri\": $3, \"transitiontime\": 70 }" "groups/0/action"
  	else 
  		hue_put "{ \"on\": true }" "groups/0/action"
  	fi	
