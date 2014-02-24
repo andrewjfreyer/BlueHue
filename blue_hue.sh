@@ -124,6 +124,7 @@ while ($1); do
 	for repetition in $(seq 1 $DefaultRepeatSequence); 
 	do 
 		ScanResult=$(hcitool name "$DefaultMacAddress" 2>&1)
+		
 		iPhonePresent=$(echo "$ScanResult" | grep -ic "$DeviceName")
 
 		if [ "$ScanResult" == "" ]; then
