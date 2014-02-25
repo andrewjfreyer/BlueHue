@@ -52,11 +52,85 @@ fi
 # DEFAULTS
 # ----------------------------------------------------------------------------------------
 
-DefaultWaitWhilePresent=25
+DefaultWaitWhilePresent=60
 DefaultWaitWhileAbsent=10
-DefaultWaitWhileVerify=3
-DefaultWait=10
-DefaultRepeatSequence=10
+DefaultWaitWhileVerify=5
+DefaultWait=20
+DefaultRepeatSequence=7
+
+CurrentHour=$(date "+%H")
+CurrentCalendarWhileAbsent=60
+
+function notify () {
+	if [ ! -z "$1" ]; then 
+		[ -f $NOTIFICATIONSOURCE ] && notifyViaPushover "$1"
+	fi
+}
+
+# ----------------------------------------------------------------------------------------
+# COLOR PER TIME OF DAY
+# ----------------------------------------------------------------------------------------
+
+function absent_delay () {
+	hour=$(date "+%M")
+
+	#tally the number of times an absent phone becomes arrives during the course of the day
+	#in order to power down the interface if neccessary
+
+	#count of delay for this hour
+	if [ "$CurrentHour" == "$hour" ]; then 
+		#should return the same delay
+		echo "$CurrentCalendarWhileAbsent"
+		return
+
+	else
+		#should check for new delay
+		now_count=$(cat /home/pi/hue/support/hue_calendar | grep "$hour:" | awk -F ":" '{print $2}')
+		total=$(cat /home/pi/hue/support/hue_calendar | grep "total:" | awk -F ":" '{print $2}')
+		percent=$((100*now_count/total))
+
+		if ((percent<=10 && percent<0)); then
+			#Less than 10% of the time, we arrive home in this hour;
+			#five times the delay
+			CurrentCalendarWhileAbsent=$((DefaultWaitWhileAbsent*5)) 
+		elif ((10<percent && percent<50)); then
+			#less than 50% of the time, we're arriving now
+			CurrentCalendarWhileAbsent=$((DefaultWaitWhileAbsent*3)) 
+		elif ((49<percent)); then
+			#more than 50% of the time, we're arriving now
+			CurrentCalendarWhileAbsent=$DefaultWaitWhileAbsent
+		else
+			#never arrived during this hour; max delay
+			CurrentCalendarWhileAbsent=$((DefaultWaitWhileAbsent*10)) 
+		fi
+
+		echo "$CurrentCalendarWhileAbsent"
+		return
+	fi
+}
+
+function update_calendar () {
+	
+	if [ ! -f /home/pi/hue/support/hue_calendar]; then 
+		#load default if necessary
+		seq 0 24 | sed 's/$/:0/g;s/24/total/g' > /home/pi/hue/support/hue_calendar
+	fi 
+	#update the arrival calendar for this hour
+	current_calendar=$(cat /home/pi/hue/support/hue_calendar)
+	old_count=$(echo "$current_calendar" | grep "$CurrentHour:"| awk -F ":" '{print $2}')
+	old_total=$(cat /home/pi/hue/support/hue_calendar | grep "total:" | awk -F ":" '{print $2}')
+
+	new_count=$((old_count+1))
+	new_total=$((total+1))
+	percent=$((100*now_count/new_total))
+
+	notify "You arrive at this hour $percent% of the time."
+
+	#Create new file
+	echo "$current_calendar" | sed 's/'$CurrentHour':'$old_count'/'$CurrentHour':'$new_count'/g;s/'$CurrentHour':'$old_total'/'$CurrentHour':'$new_total'/g' > /home/pi/hue/support/hue_calendar
+
+
+}
 
 # ----------------------------------------------------------------------------------------
 # COLOR PER TIME OF DAY
@@ -118,7 +192,7 @@ function hue_allon_custom () {
 # INFINITE LOOP
 # ----------------------------------------------------------------------------------------
 
-[ -f $NOTIFICATIONSOURCE ] && notifyViaPushover "BlueHue Proxmity Started."
+notify "BlueHue Proxmity Started."
 
 while ($1); do
 	for repetition in $(seq 1 $DefaultRepeatSequence); 
@@ -131,7 +205,7 @@ while ($1); do
 			if [ "$laststatus" != 0 ]; then  
 				if [ "$repetition" -eq $DefaultRepeatSequence ] ; then 
 					#iPhone left
-					[ -f $NOTIFICATIONSOURCE ] && notifyViaPushover "All lights have been turned off."
+					notify "All lights have been turned off."
 					hue_alloff
 					laststatus=0
 					DefaultWait=$DefaultWaitWhileAbsent
@@ -147,7 +221,11 @@ while ($1); do
 		elif [ "$iPhonePresent" == "1" ]; then 
 			if [ "$laststatus" != 1 ]; then  
 				#iPhone arrived
-				[ -f $NOTIFICATIONSOURCE ] && notifyViaPushover "All lights have been turned on."
+				notify "All lights have been turned on."
+				#update the arrival calendar
+				update_calendar
+
+				#Turn all lights on
 				hue_allon_custom
 				laststatus=1
 			else
