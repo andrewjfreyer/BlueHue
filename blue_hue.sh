@@ -72,7 +72,7 @@ function notify () {
 # ----------------------------------------------------------------------------------------
 
 function absent_delay () {
-	hour=$(date "+%M")
+	hour=$(date "+%H")
 
 	#tally the number of times an absent phone becomes arrives during the course of the day
 	#in order to power down the interface if neccessary
