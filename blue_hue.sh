@@ -137,8 +137,8 @@ function update_calendar () {
 		new_total_depart=$((old_total+1))
 	fi
 
-	percent_arrive=$((100*new_count_arrive/new_total_arrive))
-	percent_depart=$((100*new_count_depart/new_total_depart))
+	percent_arrive=$((100*new_count_arrive/(new_total_arrive+1)))
+	percent_depart=$((100*new_count_depart/(new_total_depart+1)))
 
 	notify "You arrive this hour $percent_arrive% of the time and leave $percent_depart% of the time."
 	#Create new file
