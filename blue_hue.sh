@@ -213,7 +213,7 @@ while ($1); do
 				fi
 			else
 				#iPhone remains absent
-				DefaultWait=$DefaultWaitWhileAbsent
+				DefaultWait=$(absent_delay)
 				break
 			fi 
 			sleep "$DefaultWaitWhileVerify"
