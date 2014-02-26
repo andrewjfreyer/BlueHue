@@ -127,7 +127,7 @@ function update_calendar () {
 	notify "You arrive at this hour $percent% of the time."
 
 	#Create new file
-	echo "$current_calendar" | sed 's/'$CurrentHour':'$old_count'/'$CurrentHour':'$new_count'/g;s/'$CurrentHour':'$old_total'/'$CurrentHour':'$new_total'/g' > /home/pi/hue/support/hue_calendar
+	echo "$current_calendar" | sed 's/'$CurrentHour':'$old_count'/'$CurrentHour':'$new_count'/g;s/total:'$old_total'/total:'$new_total'/g' > /home/pi/hue/support/hue_calendar
 
 
 }
