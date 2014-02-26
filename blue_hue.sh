@@ -121,7 +121,7 @@ function update_calendar () {
 	old_total=$(cat /home/pi/hue/support/hue_calendar | grep "total:" | awk -F ":" '{print $2}')
 
 	new_count=$((old_count+1))
-	new_total=$((total+1))
+	new_total=$((old_total+1))
 	percent=$((100*now_count/new_total))
 
 	notify "You arrive at this hour $percent% of the time."
