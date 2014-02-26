@@ -113,23 +113,36 @@ function update_calendar () {
 	
 	if [ ! -f /home/pi/hue/support/hue_calendar]; then 
 		#load default if necessary
-		seq 0 24 | sed 's/$/:0/g;s/24/total/g' > /home/pi/hue/support/hue_calendar
+		seq 0 24 | sed 's/$/:0:0/g;s/24/total/g' > /home/pi/hue/support/hue_calendar
 	fi 
 	#update the arrival calendar for this hour
 	current_calendar=$(cat /home/pi/hue/support/hue_calendar)
-	old_count=$(echo "$current_calendar" | grep "$CurrentHour:"| awk -F ":" '{print $2}')
-	old_total=$(cat /home/pi/hue/support/hue_calendar | grep "total:" | awk -F ":" '{print $2}')
+	old_count_arrive=$(echo "$current_calendar" | grep "$CurrentHour:"| awk -F ":" '{print $2}')
+	old_count_depart=$(echo "$current_calendar" | grep "$CurrentHour:"| awk -F ":" '{print $3}')
 
-	new_count=$((old_count+1))
-	new_total=$((old_total+1))
-	percent=$((100*now_count/new_total))
+	old_total_arrive=$(cat /home/pi/hue/support/hue_calendar | grep "total:" | awk -F ":" '{print $2}')
+	old_total_depart=$(cat /home/pi/hue/support/hue_calendar | grep "total:" | awk -F ":" '{print $3}')
 
-	notify "You arrive at this hour $percent% of the time."
+	new_total_arrive=$old_total_arrive
+	new_count_arrive=$old_count_arrive
+	new_count_depart=$old_count_depart
 
+	if [ "$1" == "arrive" ]; then 
+		#adjust only the arrivals 
+		new_count_arrive=$((old_count+1))
+		new_total_arrive=$((old_total+1))
+	else
+		#adjust only the departures
+		new_count_depart=$((old_count+1))
+		new_total_depart=$((old_total+1))
+	fi
+
+	percent_arrive=$((100*new_count_arrive/new_total_arrive))
+	percent_depart=$((100*new_count_depart/new_total_depart))
+
+	notify "You arrive this hour $percent_arrive% of the time and leave $percent_depart% of the time."
 	#Create new file
-	echo "$current_calendar" | sed 's/'$CurrentHour':'$old_count'/'$CurrentHour':'$new_count'/g;s/total:'$old_total'/total:'$new_total'/g' > /home/pi/hue/support/hue_calendar
-
-
+	echo "$current_calendar" | sed 's/'$CurrentHour':'$old_count_arrive':'$old_count_depart'/'$CurrentHour':'$new_count_arrive':'$new_count_depart'/g;s/total:'$old_total_arrive':'$old_total_depart'/total:'$new_total_arrive':'$new_total_depart'/g' > /home/pi/hue/support/hue_calendar
 }
 
 # ----------------------------------------------------------------------------------------
@@ -205,6 +218,8 @@ while ($1); do
 			if [ "$laststatus" != 0 ]; then  
 				if [ "$repetition" -eq $DefaultRepeatSequence ] ; then 
 					#iPhone left
+					update_calendar "depart"
+
 					notify "All lights have been turned off."
 					hue_alloff
 					laststatus=0
@@ -223,7 +238,7 @@ while ($1); do
 				#iPhone arrived
 				notify "All lights have been turned on."
 				#update the arrival calendar
-				update_calendar
+				update_calendar "arrive"
 
 				#Turn all lights on
 				hue_allon_custom
