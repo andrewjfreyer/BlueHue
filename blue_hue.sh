@@ -114,11 +114,10 @@ function update_calendar () {
 
 	if [ ! -f /home/pi/hue/support/hue_calendar ] || [ -z "$current_calendar" ]; then 
 		#load default if necessary
-		seq 0 24 | sed 's/$/:0:0/g;s/24/total/g' > /home/pi/hue/support/hue_calendar
+		current_calendar=$(seq 0 24 | sed 's/$/:0:0/g;s/24/total/g')
+		echo "$current_calendar" > /home/pi/hue/support/hue_calendar
 	fi 
 
-	exit 
-	
 	#update the arrival calendar for this hour
 	old_count_arrive=$(echo "$current_calendar" | grep "$CurrentHour:"| awk -F ":" '{print $2}')
 	old_count_depart=$(echo "$current_calendar" | grep "$CurrentHour:"| awk -F ":" '{print $3}')
