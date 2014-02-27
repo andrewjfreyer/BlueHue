@@ -114,7 +114,7 @@ function update_calendar () {
 
 	if [ ! -f /home/pi/hue/support/hue_calendar ] || [ -z "$current_calendar" ]; then 
 		#load default if necessary
-		current_calendar=$(seq 0 24 | sed 's/$/:0:0/g;s/24/total/g')
+		current_calendar=$(seq 0 24 | sed 's/^/>/g;s/$/:0:0/g;s/24/total/g')
 		echo "$current_calendar" > /home/pi/hue/support/hue_calendar
 	fi 
 
@@ -131,12 +131,12 @@ function update_calendar () {
 
 	if [ "$1" == "arrive" ]; then 
 		#adjust only the arrivals 
-		new_count_arrive=$((old_count+1))
-		new_total_arrive=$((old_total+1))
+		new_count_arrive=$((old_count_arrive+1))
+		new_total_arrive=$((old_total_arrive+1))
 	else
 		#adjust only the departures
-		new_count_depart=$((old_count+1))
-		new_total_depart=$((old_total+1))
+		new_count_depart=$((old_count_depart+1))
+		new_total_depart=$((old_total_depart+1))
 	fi
 
 	percent_arrive=$((100*new_count_arrive/(new_total_arrive+1)))
