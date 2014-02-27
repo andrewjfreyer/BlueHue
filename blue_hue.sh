@@ -52,11 +52,11 @@ fi
 # DEFAULTS
 # ----------------------------------------------------------------------------------------
 
-DefaultWaitWhilePresent=60
-DefaultWaitWhileAbsent=10
-DefaultWaitWhileVerify=5
+DefaultWaitWhilePresent=60 	#higher means slower turn off when leaving
+DefaultWaitWhileAbsent=10  	#higher means slower recognition when turning on 
+DefaultWaitWhileVerify=5 	#higher means slower verification of absence times
 DefaultWait=20
-DefaultRepeatSequence=1
+DefaultRepeatSequence=7 #lower means more false rejection 
 
 CurrentHour=$(date "+%H")
 CurrentCalendarWhileAbsent=60
