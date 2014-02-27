@@ -252,6 +252,8 @@ while ($1); do
 			break
 		else
 			echo "Unknown state."
+			notify "Bluetooth device has likely failed. Exiting."
+			exit 127
 		fi
 	done
 	sleep "$DefaultWait"
