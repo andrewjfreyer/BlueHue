@@ -111,7 +111,7 @@ function absent_delay () {
 
 function update_calendar () {
 	
-	if [ ! -f /home/pi/hue/support/hue_calendar]; then 
+	if [ ! -f /home/pi/hue/support/hue_calendar ]; then 
 		#load default if necessary
 		seq 0 24 | sed 's/$/:0:0/g;s/24/total/g' > /home/pi/hue/support/hue_calendar
 	fi 
