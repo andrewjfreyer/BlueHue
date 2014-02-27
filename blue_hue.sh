@@ -56,7 +56,7 @@ DefaultWaitWhilePresent=60
 DefaultWaitWhileAbsent=10
 DefaultWaitWhileVerify=5
 DefaultWait=20
-DefaultRepeatSequence=7
+DefaultRepeatSequence=1
 
 CurrentHour=$(date "+%H")
 CurrentCalendarWhileAbsent=60
@@ -119,15 +119,15 @@ function update_calendar () {
 	fi 
 
 	#update the arrival calendar for this hour
-	old_count_arrive=$(echo "$current_calendar" | grep "$CurrentHour:"| awk -F ":" '{print $2}')
-	old_count_depart=$(echo "$current_calendar" | grep "$CurrentHour:"| awk -F ":" '{print $3}')
+	old_count_arrive=$(echo "$current_calendar" | grep ">$CurrentHour:"| awk -F ":" '{print $2}')
+	old_count_depart=$(echo "$current_calendar" | grep ">$CurrentHour:"| awk -F ":" '{print $3}')
 
-	old_total_arrive=$(cat /home/pi/hue/support/hue_calendar | grep "total:" | awk -F ":" '{print $2}')
-	old_total_depart=$(cat /home/pi/hue/support/hue_calendar | grep "total:" | awk -F ":" '{print $3}')
+	old_total_arrive=$(cat /home/pi/hue/support/hue_calendar | grep ">total:" | awk -F ":" '{print $2}')
+	old_total_depart=$(cat /home/pi/hue/support/hue_calendar | grep ">total:" | awk -F ":" '{print $3}')
 
-	new_total_arrive=$old_total_arrive
-	new_count_arrive=$old_count_arrive
-	new_count_depart=$old_count_depart
+	new_total_arrive="$old_total_arrive"
+	new_count_arrive="$old_count_arrive"
+	new_count_depart="$old_count_depart"
 
 	if [ "$1" == "arrive" ]; then 
 		#adjust only the arrivals 
@@ -144,7 +144,7 @@ function update_calendar () {
 
 	notify "You arrive this hour $percent_arrive% of the time and leave $percent_depart% of the time."
 	#Create new file
-	echo "$current_calendar" | sed 's/'$CurrentHour':'$old_count_arrive':'$old_count_depart'/'$CurrentHour':'$new_count_arrive':'$new_count_depart'/g;s/total:'$old_total_arrive':'$old_total_depart'/total:'$new_total_arrive':'$new_total_depart'/g' > /home/pi/hue/support/hue_calendar
+	echo "$current_calendar" | sed 's/>'$CurrentHour':'$old_count_arrive':'$old_count_depart'/>'$CurrentHour':'$new_count_arrive':'$new_count_depart'/g;s/>total:'$old_total_arrive':'$old_total_depart'/>total:'$new_total_arrive':'$new_total_depart'/g' > /home/pi/hue/support/hue_calendar
 }
 
 # ----------------------------------------------------------------------------------------
