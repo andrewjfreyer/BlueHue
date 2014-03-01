@@ -52,11 +52,11 @@ fi
 # DEFAULTS
 # ----------------------------------------------------------------------------------------
 
-DefaultWaitWhilePresent=60 	#higher means slower turn off when leaving
+DefaultWaitWhilePresent=45 	#higher means slower turn off when leaving
 DefaultWaitWhileAbsent=10  	#higher means slower recognition when turning on 
 DefaultWaitWhileVerify=5 	#higher means slower verification of absence times
 DefaultWait=20
-DefaultRepeatSequence=7 #lower means more false rejection 
+DefaultRepeatSequence=7 	#lower means more false rejection 
 
 CurrentHour=$(date "+%H")
 CurrentCalendarWhileAbsent=60
@@ -68,46 +68,8 @@ function notify () {
 }
 
 # ----------------------------------------------------------------------------------------
-# COLOR PER TIME OF DAY
+# Update Data Calendar
 # ----------------------------------------------------------------------------------------
-
-function absent_delay () {
-	hour=$(date "+%H")
-
-	#tally the number of times an absent phone becomes arrives during the course of the day
-	#in order to power down the interface if neccessary
-
-	#count of delay for this hour
-	if [ "$CurrentHour" == "$hour" ]; then 
-		#should return the same delay
-		echo "$CurrentCalendarWhileAbsent"
-		return
-
-	else
-		#should check for new delay
-		now_count=$(cat /home/pi/hue/support/hue_calendar | grep "$hour:" | awk -F ":" '{print $2}')
-		total=$(cat /home/pi/hue/support/hue_calendar | grep "total:" | awk -F ":" '{print $2}')
-		percent=$((100*now_count/total))
-
-		if ((percent<=10 && percent<0)); then
-			#Less than 10% of the time, we arrive home in this hour;
-			#five times the delay
-			CurrentCalendarWhileAbsent=$((DefaultWaitWhileAbsent*5)) 
-		elif ((10<percent && percent<50)); then
-			#less than 50% of the time, we're arriving now
-			CurrentCalendarWhileAbsent=$((DefaultWaitWhileAbsent*3)) 
-		elif ((49<percent)); then
-			#more than 50% of the time, we're arriving now
-			CurrentCalendarWhileAbsent=$DefaultWaitWhileAbsent
-		else
-			#never arrived during this hour; max delay
-			CurrentCalendarWhileAbsent=$((DefaultWaitWhileAbsent*10)) 
-		fi
-
-		echo "$CurrentCalendarWhileAbsent"
-		return
-	fi
-}
 
 function update_calendar () {
 	current_calendar=$(cat /home/pi/hue/support/hue_calendar)
@@ -230,7 +192,7 @@ while ($1); do
 				fi
 			else
 				#iPhone remains absent
-				DefaultWait=$(absent_delay)
+				DefaultWait=$DefaultWaitWhileAbsent
 				break
 			fi 
 			sleep "$DefaultWaitWhileVerify"
