@@ -3,7 +3,7 @@
 # Hue BashLibrary (hue_bashlibrary.sh), version 1.0
 # Written 2013 by Markus Proske, released under GNU GENERAL PUBLIC LICENSE v2, see LICENSE 
 #
-#  Modified by Andrew J Freyer
+# Modified by Andrew J Freyer
 #
 # Google+: https://plus.google.com/+MarkusProske
 # Github: https://github.com/markusproske/hue_bashlibrary
@@ -237,14 +237,15 @@ function hue_onoff() {
 # Function hue_allof: turn all lights off (group 0)
 
 function hue_alloff {
-	hue_put "{ \"on\": false }" "groups/0/action"
+	#30 seconds to turn off
+	hue_put "{ \"on\": false, \"transitiontime\": 300 }" "groups/0/action"
 }
 
 # Function hue_allof: turn all lights on (group 0)
 
 function hue_allon {
-	if [ ! -z $1 ] && [ ! -z $2 ] && [ ! -z $3 ]; then 
- 		hue_put "{ \"on\": true, \"hue\": $1, \"sat\": $2, \"bri\": $3, \"transitiontime\": 70 }" "groups/0/action"
+	if [ ! -z $1 ] && [ ! -z $2 ] && [ ! -z $3 ] && [ ! -z $4 ]; then 
+ 		hue_put "{ \"on\": true, \"hue\": $1, \"sat\": $2, \"bri\": $3, \"transitiontime\": $4 }" "groups/0/action"
  	else 
  		hue_put "{ \"on\": true }" "groups/0/action"
  	fi	
