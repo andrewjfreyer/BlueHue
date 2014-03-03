@@ -68,48 +68,6 @@ function notify () {
 }
 
 # ----------------------------------------------------------------------------------------
-# Update Data Calendar
-# ----------------------------------------------------------------------------------------
-
-function update_calendar () {
-	current_calendar=$(cat /home/pi/hue/support/hue_calendar)
-
-	if [ ! -f /home/pi/hue/support/hue_calendar ] || [ -z "$current_calendar" ]; then 
-		#load default if necessary
-		current_calendar=$(seq 0 24 | sed 's/^/>/g;s/$/:0:0/g;s/24/total/g')
-		echo "$current_calendar" > /home/pi/hue/support/hue_calendar
-	fi 
-
-	#update the arrival calendar for this hour
-	old_count_arrive=$(echo "$current_calendar" | grep ">$CurrentHour:"| awk -F ":" '{print $2}')
-	old_count_depart=$(echo "$current_calendar" | grep ">$CurrentHour:"| awk -F ":" '{print $3}')
-
-	old_total_arrive=$(cat /home/pi/hue/support/hue_calendar | grep ">total:" | awk -F ":" '{print $2}')
-	old_total_depart=$(cat /home/pi/hue/support/hue_calendar | grep ">total:" | awk -F ":" '{print $3}')
-
-	new_total_arrive="$old_total_arrive"
-	new_count_arrive="$old_count_arrive"
-	new_count_depart="$old_count_depart"
-
-	if [ "$1" == "arrive" ]; then 
-		#adjust only the arrivals 
-		new_count_arrive=$((old_count_arrive+1))
-		new_total_arrive=$((old_total_arrive+1))
-	else
-		#adjust only the departures
-		new_count_depart=$((old_count_depart+1))
-		new_total_depart=$((old_total_depart+1))
-	fi
-
-	percent_arrive=$((100*new_count_arrive/(new_total_arrive+1)))
-	percent_depart=$((100*new_count_depart/(new_total_depart+1)))
-
-	notify "You arrive this hour $percent_arrive% of the time and leave $percent_depart% of the time."
-	#Create new file
-	echo "$current_calendar" | sed 's/>'$CurrentHour':'$old_count_arrive':'$old_count_depart'/>'$CurrentHour':'$new_count_arrive':'$new_count_depart'/g;s/>total:'$old_total_arrive':'$old_total_depart'/>total:'$new_total_arrive':'$new_total_depart'/g' > /home/pi/hue/support/hue_calendar
-}
-
-# ----------------------------------------------------------------------------------------
 # COLOR PER TIME OF DAY
 # ----------------------------------------------------------------------------------------
 
