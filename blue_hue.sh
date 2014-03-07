@@ -12,6 +12,8 @@
 
 source /home/pi/hue/support/hue_bashlibrary.sh
 
+
+
 if [ ! -f "/home/pi/hue/support/credentials" ]; then 
 	echo "BlueHue Requires Credentials"
 	exit 127
