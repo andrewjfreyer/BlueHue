@@ -4,27 +4,29 @@
 # ----------------------------------------------------------------------------------------
 
 # Written by Andrew J Freyer
-# Version 1.2.005
+# Version 1.3
 
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE & VAR SETTING
 # ----------------------------------------------------------------------------------------
 
 source /home/pi/hue/support/hue_bashlibrary.sh
+
+if [ ! -f "credentials" ]; then 
+	echo "BlueHue Requires Credentials"
+	exit 127
+else
+	source /home/pi/hue/support/credentials
+fi 
+
+#Support Notifications?
 NOTIFICATIONSOURCE=/home/pi/hue/support/notification.sh ; [ -f $NOTIFICATIONSOURCE ] && source $NOTIFICATIONSOURCE
 
 # ----------------------------------------------------------------------------------------
-# Credential Information
+# Credential Information Verification
 # ----------------------------------------------------------------------------------------
 
-credentials=$(cat /home/pi/hue/support/hue_credentials)
-devicetype=$(echo "$credentials" | awk '{print $1}')							
-username=$(echo "$credentials" | awk '{print $2}')
-DefaultMacAddress=$(echo "$credentials" | awk '{print $3}')
-DeviceName=$(echo "$credentials" | awk '{print $4}')
-
-#Error; One or more credentials is not found
-if [ -z $devicetype ] ||  [ -z $username ] || [ -z $DefaultMacAddress ] || [ -z $DeviceName ]; then 
+if [ -z $devicetype ] ||  [ -z $username ] || [ -z $macaddress ] || [ -z $devicename ]; then 
 	echo "hue_credentials usage: devicetype username mac devicename"
 	exit 1
 fi 
@@ -77,13 +79,13 @@ function hue_allon_custom () {
 	bri=0 #0 - 255
 	hue=0 #0 - 65535
 	sat=0 #0 - 255
-        transition=10
+    transition=10 #in 1/10 seconds
 
 	hour=$(date "+%H")
 
 	if ((4<=hour && hour<=6)); then
 		#early morning -> light blue at low brighness
-		bri=50
+		bri=127
 		hue=46920
 		sat=120
 	elif ((7<=hour && hour<=10)); then
@@ -98,12 +100,12 @@ function hue_allon_custom () {
 		sat=0
 	elif ((13<=hour && hour<=16)); then
 	    #afternoon -> cool (blue) white light
-		bri=200
+		bri=255
 		hue=46920
 		sat=25
 	elif ((17<=hour && hour<=21)); then
 	    	#evening -> cool (blue) white light
-	    bri=190
+	    bri=230
 		hue=46920
 		sat=180
 	elif ((21<=hour && hour<=23)); then
@@ -132,9 +134,9 @@ notify "BlueHue Proxmity Started."
 while ($1); do
 	for repetition in $(seq 1 $DefaultRepeatSequence); 
 	do 
-		ScanResult=$(hcitool name "$DefaultMacAddress" 2>&1)
+		ScanResult=$(hcitool name "$macaddress" 2>&1)
 		
-		iPhonePresent=$(echo "$ScanResult" | grep -ic "$DeviceName")
+		iPhonePresent=$(echo "$ScanResult" | grep -ic "$devicename")
 
 		if [ "$ScanResult" == "" ]; then
 			if [ "$laststatus" != 0 ]; then  
