@@ -66,10 +66,10 @@ notify "BlueHue Proxmity Started."
 while ($1); do
 	for repetition in $(seq 1 $verifyrepetitions); 
 	do 
-		ScanResult=$(hcitool name "$macaddress" 2>&1)		
-		bluetooth devicePresent=$(echo "$ScanResult" | grep -ic "$devicename")
+		bluetoothscanresults=$(hcitool name "$macaddress" 2>&1)		
+		bluetoothdevicepresent=$(echo "$bluetoothscanresults" | grep -ic "$devicename")
 
-		if [ "$ScanResult" == "" ]; then
+		if [ "$bluetoothscanresults" == "" ]; then
 			if [ "$laststatus" != 0 ]; then  
 				if [ "$repetition" -eq $verifyrepetitions ] ; then 
 					#bluetooth device left
@@ -86,7 +86,7 @@ while ($1); do
 			fi 
 			sleep "$delaywhileverify"
 
-		elif [ "$bluetooth devicePresent" == "1" ]; then 
+		elif [ "$bluetoothdevicepresent" == "1" ]; then 
 			if [ "$laststatus" != 1 ]; then  
 				#bluetooth device arrived
 				notify "All lights have been turned on."
