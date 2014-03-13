@@ -101,17 +101,17 @@ function rssimonitor () {
 
 			if ((rssi>=0)); then
 				#very close within 0-10 feet line of sight
-				echo "Bluetooth Proximity: ~ 0-10 ft"
+				notify "Bluetooth Proximity: ~ 0-10 ft"
 
 			elif ((0>rssi && rssi>=-5)); then
 				#medium close 10 - 25 feet line of sight
-				echo "Bluetooth Proximity: ~ 10-30 ft"
+				notify "Bluetooth Proximity: ~ 10-30 ft"
 			
 			elif ((-5>rssi && rssi>=-10)); then
 				#medium close 10 - 25 feet line of sight
-				echo "Bluetooth Proximity: ~ 30 + ft"
+				notify "Bluetooth Proximity: ~ 30 + ft"
 			else
-				echo "Bluetooth Proximity: ~ 50 + ft"
+				notify "Bluetooth Proximity: ~ 50 + ft"
 			fi
 
 		fi
