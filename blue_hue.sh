@@ -4,7 +4,7 @@
 # ----------------------------------------------------------------------------------------
 
 # Written by Andrew J Freyer
-# Version 1.3
+# Version 1.4
 
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE & VAR SETTING
@@ -23,7 +23,6 @@ if [ -z $devicetype ] ||  [ -z $username ] || [ -z $macaddress ] || [ -z $device
 	exit 127
 fi 
 
-
 # ----------------------------------------------------------------------------------------
 # GET THE IP OF THE BRIDGE
 # ----------------------------------------------------------------------------------------
@@ -40,9 +39,11 @@ fi
 # DEFAULTS
 # ----------------------------------------------------------------------------------------
 
-delaywhilepresent=60 	#higher means slower turn off when leaving
-delaywhileabsent=10  	#higher means slower recognition when turning on 
-delaywhileverify=5 	#higher means slower verification of absence times
+delaywhilepresent=60 		#higher means slower turn off when leaving
+delaywhilepresentrssi=30 	#higher means slower recognition of position changes
+delaywhileabsent=10  		#higher means slower recognition when turning on 
+delaywhileverify=5 			#higher means slower verification of absence times
+delayafterconnection=15 
 defaultwait=20
 verifyrepetitions=10 	#lower means more false rejection 
 laststatus=99
@@ -55,6 +56,62 @@ function notify () {
 	if [ ! -z "$1" ]; then 
 		[ -f $NOTIFICATIONSOURCE ] && notifyViaPushover "$1"
 	fi
+}
+
+# ----------------------------------------------------------------------------------------
+# Enter RSSI Monitor Mode : Connected
+# ----------------------------------------------------------------------------------------
+
+
+function rssimonitor () {
+
+	#Internal Connection status
+	bluetoothconnected=0
+	rssi=-999
+
+	#Command loop:
+	while ($1); do
+		#if disconnected, attempt to connect & verify status
+		if [ $bluetoothconnected = "0" ]; then
+		    rfcomm connect 0 $macaddress 1 2>&1 > /dev/null &
+		    bluetoothconnected=1 	#presumption
+		    sleep $delayafterconnection
+		    continue
+		fi 
+
+		#should be connected here
+		rssiresult=$(hcitool rssi $macaddress)
+		bluetoothconnected=$(echo $rssiresult | grep -c "RSSI return value")
+		rssi=$(echo $rssiresult | sed 's/RSSI return value: //g')
+
+		#If still not connected
+        if [ $bluetoothconnected -eq 0 ]; then
+            return #Bluetooth has disconnected; re-verify in previous loop
+        fi
+
+        #various commands based on RSSI ranges
+		if [ $bluetoothconnected = "1" ]; then
+
+			if ((rssi>=0)); then
+				#very close within 0-10 feet line of sight
+				echo "Bluetooth Proximity: ~ 0-10 ft"
+
+			elif ((0>rssi && rssi>=-5)); then
+				#medium close 10 - 25 feet line of sight
+				echo "Bluetooth Proximity: ~ 10-30 ft"
+			
+			elif ((-5>rssi && rssi>=-10)); then
+				#medium close 10 - 25 feet line of sight
+				echo "Bluetooth Proximity: ~ 30 + ft"
+			else
+
+			fi
+
+		fi
+
+		sleep $delaywhilepresentrssi
+
+	done			
 }
 
 # ----------------------------------------------------------------------------------------
@@ -92,6 +149,7 @@ while ($1); do
 				notify "All lights have been turned on."
 				hue_allon_custom
 				laststatus=1
+				rssimonitor $2
 			else
 				#bluetooth device remains present.
 				defaultwait=$delaywhilepresent

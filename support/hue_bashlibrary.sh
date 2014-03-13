@@ -19,9 +19,7 @@
 cmdname=''
 lastlog=''
 result_hue_is_on=-1
-
 loglevel=0
-
 
 # GENERIC WRAPPERS
 
