@@ -40,7 +40,7 @@ fi
 # ----------------------------------------------------------------------------------------
 
 delaywhilepresent=60 		#higher means slower turn off when leaving
-delaywhilepresentrssi=30 	#higher means slower recognition of position changes
+delaywhilepresentrssi=15 	#higher means slower recognition of position changes
 delaywhileabsent=10  		#higher means slower recognition when turning on 
 delaywhileverify=5 			#higher means slower verification of absence times
 delayafterconnection=15 
