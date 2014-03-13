@@ -111,7 +111,7 @@ function rssimonitor () {
 				#medium close 10 - 25 feet line of sight
 				echo "Bluetooth Proximity: ~ 30 + ft"
 			else
-
+				echo "Bluetooth Proximity: ~ 50 + ft"
 			fi
 
 		fi
