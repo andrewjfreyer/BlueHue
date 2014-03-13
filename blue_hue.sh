@@ -65,6 +65,13 @@ function notify () {
 
 function rssimonitor () {
 
+	#check for root
+	if [[ $UID -ne 0 ]]; then
+		echo "root required for rssi"
+		return
+	fi
+
+
 	#Internal Connection status
 	bluetoothconnected=0
 	rssi=-999
