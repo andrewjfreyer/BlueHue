@@ -239,7 +239,7 @@ function hue_onoff() {
 
 function hue_alloff {
 	#30 seconds to turn off
-	hue_put "{ \"on\": false, \"transitiontime\": 300 }" "groups/0/action"
+	hue_put "{ \"on\": false, \"transitiontime\": 100 }" "groups/0/action"
 }
 
 # Function hue_allof: turn all lights on (group 0)

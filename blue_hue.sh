@@ -74,7 +74,8 @@ function rssimonitor () {
 
 	#Internal Connection status
 	bluetoothconnected=0
-	rssi=-999
+	rssi=0
+	rssilast=1
 
 	#Command loop:
 	while ($1); do
@@ -89,6 +90,7 @@ function rssimonitor () {
 		#should be connected here
 		rssiresult=$(hcitool rssi $macaddress)
 		bluetoothconnected=$(echo $rssiresult | grep -c "RSSI return value")
+		rssilast=$rssi
 		rssi=$(echo $rssiresult | sed 's/RSSI return value: //g')
 
 		#If still not connected
@@ -99,21 +101,18 @@ function rssimonitor () {
         #various commands based on RSSI ranges
 		if [ $bluetoothconnected = "1" ]; then
 
-			if ((rssi>=0)); then
+			if ((rssi=rssilast)); then
 				#very close within 0-10 feet line of sight
-				notify "Bluetooth Proximity: ~ 0-10 ft"
+				continue
 
-			elif ((0>rssi && rssi>=-5)); then
+			elif ((rssi>rssilast)); then
 				#medium close 10 - 25 feet line of sight
-				notify "Bluetooth Proximity: ~ 10-30 ft"
+				notify "Bluetooth Proximity: Further Away"
 			
-			elif ((-5>rssi && rssi>=-10)); then
+			elif ((rssi<rssilast)); then
 				#medium close 10 - 25 feet line of sight
-				notify "Bluetooth Proximity: ~ 30 + ft"
-			else
-				notify "Bluetooth Proximity: ~ 50 + ft"
+				notify "Bluetooth Proximity: ~ Closer"
 			fi
-
 		fi
 
 		sleep $delaywhilepresentrssi
