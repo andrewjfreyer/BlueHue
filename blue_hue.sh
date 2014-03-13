@@ -67,10 +67,9 @@ function rssimonitor () {
 
 	#check for root
 	if [[ $UID -ne 0 ]]; then
-		echo "root required for rssi"
+		notify "root required for rssi"
 		return
 	fi
-
 
 	#Internal Connection status
 	bluetoothconnected=0
@@ -97,6 +96,8 @@ function rssimonitor () {
         if [ $bluetoothconnected -eq 0 ]; then
             return #Bluetooth has disconnected; re-verify in previous loop
         fi
+
+        notify "$rssi - $rssilast"
 
         #various commands based on RSSI ranges
 		if [ $bluetoothconnected = "1" ]; then
@@ -155,10 +156,14 @@ while ($1); do
 				notify "All lights have been turned on."
 				hue_allon_custom
 				laststatus=1
-				rssimonitor $2
+				rssimonitor true
 			else
 				#bluetooth device remains present.
 				defaultwait=$delaywhilepresent
+
+				#missed the connection before leaving, try again
+				rssimonitor true
+
 			fi
 			break
 		else
