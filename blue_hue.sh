@@ -44,7 +44,7 @@ delaywhilepresentrssi=5 	#higher means slower recognition of position changes
 delaywhilepresentrssimotion=11
 delaywhileabsent=10  		#higher means slower recognition when turning on 
 delaywhileverify=5 			#higher means slower verification of absence times
-delayafterconnection=15 
+delayafterconnection=5 
 defaultwait=20
 verifyrepetitions=10 	#lower means more false rejection 
 laststatus=99
@@ -101,7 +101,7 @@ function rssimonitor () {
 		rssi=$(echo $rssiresult | sed 's/RSSI return value: //g')
 
 		rssiconstantA=10
-		rssiconstantA=2
+		rssiconstantN=2
 
 		notify $(( 10 ** ((-rssi+rssiconstantA)/(10*rssiconstantN)) ))
 
