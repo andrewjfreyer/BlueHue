@@ -76,18 +76,13 @@ function rssimonitor () {
 	rssilast=1
 
 	#Command loop:
-	while ($1); do
+	while [ 1 ];  do
 		#if disconnected, attempt to connect & verify status
 		if [ $bluetoothconnected = "0" ]; then
-			notify "should disconnect"
+		    rfcomm release $macaddress
 		    rfcomm connect 0 $macaddress 1 2>&1 > /dev/null &
 		    bluetoothconnected=1 	#presumption
 		    sleep $delayafterconnection
-
-		    rfcomm release $macaddress
-
-		    notify "should disconnect"
-
 		    continue
 		fi 
 
@@ -99,6 +94,7 @@ function rssimonitor () {
 
 		#If still not connected
         if [ $bluetoothconnected -eq 0 ]; then
+		    rfcomm release $macaddress
             break #Bluetooth has disconnected; re-verify in previous loop
         fi
 
