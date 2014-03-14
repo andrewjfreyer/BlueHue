@@ -72,7 +72,7 @@ function rssimonitor () {
 
 	#Internal Connection status
 	bluetoothconnected=0
-	rssi=0
+	rssi=-99
 	rssilast=1
 
 	#Command loop:
@@ -89,7 +89,8 @@ function rssimonitor () {
 		#should be connected here
 		rssiresult=$(hcitool rssi $macaddress)
 		bluetoothconnected=$(echo $rssiresult | grep -c "RSSI return value")
-		rssilast="$rssi"
+
+		rssilast=$rssi
 		rssi=$(echo $rssiresult | sed 's/RSSI return value: //g')
 
 		#If still not connected
