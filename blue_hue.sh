@@ -75,6 +75,7 @@ function rssimonitor () {
 	bluetoothconnected=0
 	rssi=0
 	rssilast=99
+	rssilastmotion=99
 
 	#motion prediction
 	lastchange=$(date +%s)
@@ -94,7 +95,15 @@ function rssimonitor () {
 		rssiresult=$(hcitool rssi $macaddress)
 		bluetoothconnected=$(echo $rssiresult | grep -c "RSSI return value")
 		
+		rssilast=$(echo "$rssi")
+
+
 		rssi=$(echo $rssiresult | sed 's/RSSI return value: //g')
+
+		rssiconstantA=10
+		rssiconstantA=2
+
+		notify $(( 10 ** ((-rssi+rssiconstantA)/(10*rssiconstantN)) ))
 
 		#If still not connected
         if [ $bluetoothconnected -eq 0 ]; then
@@ -112,19 +121,16 @@ function rssimonitor () {
 
 				thischange=$(date +%s)
 				timedifference=$((thischange-lastchange))
-				rssidifference=$(((rssi-rssilast)*(rssi-rssilast)))
+				rssidifferene=$(((rssi-rssilast)*(rssi-rssilast)))
 
 				notify "$rssi $rssilast $timedifference $rssidifference"
 
-				if [ $rssidifference -gt 15 ] || [ $rssilast -eq 99 ]; then 
-
-					if [ $timedifference -gt $delaywhilepresentrssimotion ] || [ $rssilast -eq 99 ]; then 
-
-						lastchange=$(date +%s)
-						rssilast=$(echo "$rssi")
-		
-						notify "Motion detected."
-					fi
+				if [ $rssidifferencemajor -gt 15 ] && [ $timedifference -gt $delaywhilepresentrssimotion ]; then 
+					
+					lastchange=$(date +%s)
+					rssilast=$(echo "$rssi")
+					rssilastmotion=$(echo "$rssi")
+					notify "Motion detected."
 				fi 
 			fi
 		fi
