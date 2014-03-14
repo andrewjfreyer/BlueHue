@@ -99,7 +99,7 @@ function rssimonitor () {
 
 		#If still not connected
         if [ $bluetoothconnected -eq 0 ]; then
-		    rfcomm release $macaddress
+		    rfcomm release $macaddress 2>&1 > /dev/null &
 		    notify "Connection lost. Lights will be turned out shortly."
             break #Bluetooth has disconnected; re-verify in previous loop
         fi
