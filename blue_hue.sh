@@ -100,10 +100,12 @@ function rssimonitor () {
 
 		rssi=$(echo $rssiresult | sed 's/RSSI return value: //g')
 
-		rssiconstantA=40
-		rssiconstantN=4
+		rssiconstantA=50
+		rssiconstantN=2
 
 		notify $(( 10 ** ((-rssi+rssiconstantA)/(10*rssiconstantN)) ))
+
+		sleep 5
 		continue
 
 		#If still not connected
