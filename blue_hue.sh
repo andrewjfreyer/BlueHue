@@ -41,6 +41,7 @@ fi
 
 delaywhilepresent=60 		#higher means slower turn off when leaving
 delaywhilepresentrssi=5 	#higher means slower recognition of position changes
+delaywhilepresentrssimotion=10
 delaywhileabsent=10  		#higher means slower recognition when turning on 
 delaywhileverify=5 			#higher means slower verification of absence times
 delayafterconnection=15 
@@ -112,10 +113,8 @@ function rssimonitor () {
 				thischange=$(date +%s)
 				timedifference=$((thischange-lastchange))
 				rssidifference=$(((rssi-rssilast)*(rssi-rssilast)))
-
-				if [ $rssidifference -gt 8 ] || [ $rssilast -eq 99 ] ; then 
-
-					if [ $timedifference -gt ((delaywhilepresentrssi*2)) ]; then 
+				if [ $rssidifference -gt 8 ] || [ $rssilast -eq 99 ]; then 
+					if [ $timedifference -gt $delaywhilepresentrssimotion ]; then 
 
 						lastchange=$(date +%s)
 						rssilast=$(echo "$rssi")
