@@ -114,7 +114,7 @@ function rssimonitor () {
 				timedifference=$((thischange-lastchange))
 				rssidifference=$(((rssi-rssilast)*(rssi-rssilast)))
 
-				notify "$rssi $rssilast $timedifference"
+				notify "$rssi $rssilast $timedifference $rssidifference"
 
 				if [ $rssidifference -gt 3 ] || [ $rssilast -eq 99 ]; then 
 
