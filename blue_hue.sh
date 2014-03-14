@@ -113,7 +113,7 @@ function rssimonitor () {
 				thischange=$(date +%s)
 				timedifference=$((thischange-lastchange))
 				#ABS cheating
-				rssidifference=$(((rssi-rssilast)*(rssi-rssilast)/(rssi-rssilast)/(rssi-rssilast))
+				rssidifference=$(( (rssi-rssilast)*(rssi-rssilast)/(rssi-rssilast)/(rssi-rssilast) ))
 
 				notify "Time since: $timedifference $rssidifference"
 
