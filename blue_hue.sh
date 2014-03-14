@@ -72,7 +72,7 @@ function rssimonitor () {
 
 	#Internal Connection status
 	bluetoothconnected=0
-	rssi=-99
+	rssi=0
 	rssilast=1
 
 	#motion prediction
@@ -114,16 +114,14 @@ function rssimonitor () {
 				timedifference=$((thischange-lastchange))
 				rssidifference=$((rssi-rssilast))
 
-				if [ $rssidifference -gt 4 ]; then 
+				if [ $rssidifference -gt 2 ]; then 
 					notify "Time since: $timedifference $rssidifference"
 					lastchange=$(date +%s)
 	
 					if [ $rssi -gt $rssilast ]; then
-						#medium close 10 - 25 feet line of sight
 						notify "Bluetooth Proximity: ~ Further Away"
 					
 					elif [ $rssi -lt $rssilast ]; then
-						#medium close 10 - 25 feet line of sight
 						notify "Bluetooth Proximity: ~ Closer"
 					fi
 				fi 
