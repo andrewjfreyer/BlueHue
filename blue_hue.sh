@@ -118,17 +118,12 @@ function rssimonitor () {
 
 				if [ $rssidifference -gt 3 ] || [ $rssilast -eq 99 ]; then 
 
-					if [ $timedifference -gt $delaywhilepresentrssimotion ]; then 
+					if [ $timedifference -gt $delaywhilepresentrssimotion ] || [ $rssilast -eq 99 ]; then 
 
 						lastchange=$(date +%s)
 						rssilast=$(echo "$rssi")
 		
-						if [ $rssi -gt $rssilast ]; then
-							notify "Motion: ~ Further Away"
-						
-						elif [ $rssi -lt $rssilast ]; then
-							notify "Motion: ~ Closer"
-						fi
+						notify "Motion detected."
 					fi
 				fi 
 			fi
