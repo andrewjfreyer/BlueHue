@@ -111,21 +111,21 @@ function rssimonitor () {
 
 				thischange=$(date +%s)
 				timedifference=$((thischange-lastchange))
-				#ABS cheating
 				rssidifference=$(((rssi-rssilast)*(rssi-rssilast)))
 
+				if [ $rssidifference -gt 8 ] || [ $rssilast -eq 99 ] ; then 
 
-				if [ $rssidifference -gt 1 ] || [ $rssilast -eq 99 ] ; then 
-					notify "Time since: $timedifference $rssidifference $rssilast $rssi"
+					if [ $timedifference -gt ((delaywhilepresentrssi*2)) ]; then 
 
-					lastchange=$(date +%s)
-					rssilast=$(echo "$rssi")
-	
-					if [ $rssi -gt $rssilast ]; then
-						notify "Bluetooth Proximity: ~ Further Away"
-					
-					elif [ $rssi -lt $rssilast ]; then
-						notify "Bluetooth Proximity: ~ Closer"
+						lastchange=$(date +%s)
+						rssilast=$(echo "$rssi")
+		
+						if [ $rssi -gt $rssilast ]; then
+							notify "Motion: ~ Further Away"
+						
+						elif [ $rssi -lt $rssilast ]; then
+							notify "Motion: ~ Closer"
+						fi
 					fi
 				fi 
 			fi
