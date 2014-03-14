@@ -118,9 +118,8 @@ function rssimonitor () {
 				thischange=$(date +%s)
 				timedifference=$((thischange-lastchange))
 				rssidifference=$(((rssi-rssilast)*(rssi-rssilast)))
-				notify "$rssi $rssilast $timedifference $rssidifference"
 
-				if [ $rssidifference -gt 15 ] && [ $timedifference -gt $delaywhilepresentrssimotion ]; then 
+				if [ $rssidifference -gt 48 ] && [ $timedifference -gt $delaywhilepresentrssimotion ]; then 
 					
 					lastchange=$(date +%s)
 					rssilast=$(echo "$rssi")
