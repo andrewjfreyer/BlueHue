@@ -114,7 +114,7 @@ function rssimonitor () {
 				#ABS cheating
 				rssidifference=$(( (rssi-rssilast)*(rssi-rssilast)/(rssi-rssilast)/(rssi-rssilast) ))
 
-				notify "Time since: $timedifference $rssidifference"
+				notify "Time since: $timedifference $rssidifference $rssilast $rssi"
 
 				if [ $rssidifference -gt 2 ]; then 
 					rssilast=$(echo "$rssi")
