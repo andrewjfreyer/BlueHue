@@ -95,24 +95,18 @@ function rssimonitor () {
 		rssiresult=$(hcitool rssi $macaddress)
 		bluetoothconnected=$(echo $rssiresult | grep -c "RSSI return value")
 		
-		rssilast=$(echo "$rssi")
-
-
 		rssi=$(echo $rssiresult | sed 's/RSSI return value: //g')
-
-		rssiconstantA=50
-		rssiconstantN=2
-
-		notify $(( 3 ** ((-rssi+rssiconstantA)/(10*rssiconstantN)) ))
-
-		sleep 5
-		continue
 
 		#If still not connected
         if [ $bluetoothconnected -eq 0 ]; then
 		    rfcomm release $macaddress
             break #Bluetooth has disconnected; re-verify in previous loop
         fi
+
+        if [ $rssilast -eq 99 ]; then 
+			rssilast=$(echo "$rssi")
+			continue
+		fi 
 
         #various commands based on RSSI ranges
 		if [ $bluetoothconnected = "1" ]; then
@@ -121,7 +115,7 @@ function rssimonitor () {
 				sleep $delaywhilepresentrssi
 				continue
 			else
-
+				rssilast=$(echo "$rssi")
 				thischange=$(date +%s)
 				timedifference=$((thischange-lastchange))
 				rssidifference=$(((rssi-rssilast)*(rssi-rssilast)))
