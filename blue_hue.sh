@@ -46,7 +46,7 @@ delaywhileabsent=10  		#higher means slower recognition when turning on
 delaywhileverify=5 			#higher means slower verification of absence times
 delayafterconnection=5 
 defaultwait=20
-verifyrepetitions=10 	#lower means more false rejection 
+verifyrepetitions=2 		#lower means more false rejection 
 laststatus=99
 
 # ----------------------------------------------------------------------------------------
@@ -59,79 +59,21 @@ function notify () {
 	fi
 }
 
+
+
 # ----------------------------------------------------------------------------------------
 # Enter RSSI Monitor Mode : Connected
 # ----------------------------------------------------------------------------------------
 
 
-function rssimonitor () {
-	
+function rfcommconnect () {
 	#check for root
 	if [[ $UID -ne 0 ]]; then
 		return
 	fi
 
-	#Internal Connection status
-	bluetoothconnected=0
-	rssi=0
-	rssilast=99
-	rssilastmotion=99
-
-	#motion prediction
-	lastchange=$(date +%s)
-
-	#Command loop:
-	while [ 1 ];  do
-		#if disconnected, attempt to connect & verify status
-		if [ $bluetoothconnected = "0" ]; then
-		    rfcomm release $macaddress
-		    rfcomm connect 0 $macaddress 1 2>&1 > /dev/null &
-		    bluetoothconnected=1 	#presumption
-		    sleep $delayafterconnection
-		    continue
-		fi 
-
-		#should be connected here
-		rssiresult=$(hcitool rssi $macaddress)
-		bluetoothconnected=$(echo $rssiresult | grep -c "RSSI return value")
-		
-		rssi=$(echo $rssiresult | sed 's/RSSI return value: //g')
-
-		#If still not connected
-        if [ $bluetoothconnected -eq 0 ]; then
-		    rfcomm release $macaddress 2>&1 > /dev/null &
-		    notify "Connection lost. Lights will be turned out shortly."
-            break #Bluetooth has disconnected; re-verify in previous loop
-        fi
-
-        if [ $rssilast -eq 99 ]; then 
-			rssilast=$(echo "$rssi")
-			continue
-		fi 
-
-        #various commands based on RSSI ranges
-		if [ $bluetoothconnected = "1" ]; then
-			if [ $rssi -eq $rssilast ] ; then
-				#very close within 0-10 feet line of sight
-				sleep $delaywhilepresentrssi
-				continue
-			else
-				thischange=$(date +%s)
-				timedifference=$((thischange-lastchange))
-				rssidifference=$(((rssi-rssilast)*(rssi-rssilast)))
-
-				if [ $rssidifference -gt 48 ] && [ $timedifference -gt $delaywhilepresentrssimotion ]; then 
-					lastchange=$(date +%s)
-					rssilast=$(echo "$rssi")
-					notify "Motion detected."
-					hue_allon_custom
-				fi 
-			fi
-		fi
-
-		sleep $delaywhilepresentrssi
-
-	done			
+	rfcomm release $macaddress
+	rfcomm connect 0 $macaddress 1  # will wait until no longer connected
 }
 
 # ----------------------------------------------------------------------------------------
@@ -169,14 +111,13 @@ while ($1); do
 				notify "All lights have been turned on."
 				hue_allon_custom
 				laststatus=1
-				rssimonitor $2
+				rfcommconnect
 			else
 				#bluetooth device remains present.
 				defaultwait=$delaywhilepresent
 
 				#missed the connection before leaving, try again
-				rssimonitor $2
-
+				rfcommconnect
 			fi
 			break
 		else
