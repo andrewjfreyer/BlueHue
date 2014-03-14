@@ -100,6 +100,7 @@ function rssimonitor () {
 		#If still not connected
         if [ $bluetoothconnected -eq 0 ]; then
 		    rfcomm release $macaddress
+		    notify "Connection lost. Lights will be turned out shortly."
             break #Bluetooth has disconnected; re-verify in previous loop
         fi
 
@@ -120,10 +121,10 @@ function rssimonitor () {
 				rssidifference=$(((rssi-rssilast)*(rssi-rssilast)))
 
 				if [ $rssidifference -gt 48 ] && [ $timedifference -gt $delaywhilepresentrssimotion ]; then 
-					
 					lastchange=$(date +%s)
 					rssilast=$(echo "$rssi")
 					notify "Motion detected."
+					hue_allon_custom
 				fi 
 			fi
 		fi
