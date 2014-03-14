@@ -100,10 +100,11 @@ function rssimonitor () {
 
 		rssi=$(echo $rssiresult | sed 's/RSSI return value: //g')
 
-		rssiconstantA=10
-		rssiconstantN=2
+		rssiconstantA=40
+		rssiconstantN=4
 
 		notify $(( 10 ** ((-rssi+rssiconstantA)/(10*rssiconstantN)) ))
+		continue
 
 		#If still not connected
         if [ $bluetoothconnected -eq 0 ]; then
@@ -121,15 +122,14 @@ function rssimonitor () {
 
 				thischange=$(date +%s)
 				timedifference=$((thischange-lastchange))
-				rssidifferene=$(((rssi-rssilast)*(rssi-rssilast)))
+				rssidifference=$(((rssi-rssilast)*(rssi-rssilast)))
 
 				notify "$rssi $rssilast $timedifference $rssidifference"
 
-				if [ $rssidifferencemajor -gt 15 ] && [ $timedifference -gt $delaywhilepresentrssimotion ]; then 
+				if [ $rssidifference -gt 15 ] && [ $timedifference -gt $delaywhilepresentrssimotion ]; then 
 					
 					lastchange=$(date +%s)
 					rssilast=$(echo "$rssi")
-					rssilastmotion=$(echo "$rssi")
 					notify "Motion detected."
 				fi 
 			fi
