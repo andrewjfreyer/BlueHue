@@ -111,19 +111,22 @@ function rssimonitor () {
 				continue
 			else
 				thischange=$(date +%s)
-				difference=$((thischange-lastchange))
-				lastchange=$(date +%s)
-
-				notify "Time since: $difference"
-
-				if [ $rssi -gt $rssilast ]; then
-					#medium close 10 - 25 feet line of sight
-					notify "Bluetooth Proximity: ~ Further Away"
+				timedifference=$((thischange-lastchange))
+				rssidifference=$((rssi-rssilast))
 				
-				elif [ $rssi -lt $rssilast ]; then
-					#medium close 10 - 25 feet line of sight
-					notify "Bluetooth Proximity: ~ Closer"
-				fi
+				if [ $rssidifference -gt 3 ]; then 
+					notify "Time since: $timedifference"
+					lastchange=$(date +%s)
+	
+					if [ $rssi -gt $rssilast ]; then
+						#medium close 10 - 25 feet line of sight
+						notify "Bluetooth Proximity: ~ Further Away"
+					
+					elif [ $rssi -lt $rssilast ]; then
+						#medium close 10 - 25 feet line of sight
+						notify "Bluetooth Proximity: ~ Closer"
+					fi
+				fi 
 			fi
 		fi
 
