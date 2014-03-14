@@ -112,11 +112,12 @@ function rssimonitor () {
 				thischange=$(date +%s)
 				timedifference=$((thischange-lastchange))
 				#ABS cheating
-				rssidifference=$(( (rssi-rssilast)*(rssi-rssilast)/(rssi-rssilast)/(rssi-rssilast) ))
+				rssidifference=$(((rssi-rssilast)*(rssi-rssilast)))
 
-				notify "Time since: $timedifference $rssidifference $rssilast $rssi"
 
 				if [ $rssidifference -gt 1 ] || [ $rssilast -eq 99 ] ; then 
+					notify "Time since: $timedifference $rssidifference $rssilast $rssi"
+
 					lastchange=$(date +%s)
 					rssilast=$(echo "$rssi")
 	
