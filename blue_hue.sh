@@ -93,7 +93,6 @@ function rssimonitor () {
 		rssiresult=$(hcitool rssi $macaddress)
 		bluetoothconnected=$(echo $rssiresult | grep -c "RSSI return value")
 
-		rssilast=$(echo "$rssi")
 		rssi=$(echo $rssiresult | sed 's/RSSI return value: //g')
 
 		#If still not connected
@@ -104,12 +103,12 @@ function rssimonitor () {
 
         #various commands based on RSSI ranges
 		if [ $bluetoothconnected = "1" ]; then
-
 			if [ $rssi -eq $rssilast ] ; then
 				#very close within 0-10 feet line of sight
 				sleep $delaywhilepresentrssi
 				continue
 			else
+
 				thischange=$(date +%s)
 				timedifference=$((thischange-lastchange))
 				#ABS cheating
@@ -118,6 +117,7 @@ function rssimonitor () {
 				notify "Time since: $timedifference $rssidifference"
 
 				if [ $rssidifference -gt 2 ]; then 
+					rssilast=$(echo "$rssi")
 					lastchange=$(date +%s)
 	
 					if [ $rssi -gt $rssilast ]; then
