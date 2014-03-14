@@ -114,8 +114,6 @@ function rssimonitor () {
 				timedifference=$((thischange-lastchange))
 				rssidifference=$(((rssi-rssilast)*(rssi-rssilast)))
 
-				notify "$rssi $rssilast $timedifference $rssidifference"
-
 				if [ $rssidifference -gt 8 ] || [ $rssilast -eq 99 ]; then 
 
 					if [ $timedifference -gt $delaywhilepresentrssimotion ] || [ $rssilast -eq 99 ]; then 
