@@ -40,8 +40,8 @@ fi
 # ----------------------------------------------------------------------------------------
 
 delaywhilepresent=60 		#higher means slower turn off when leaving
-delaywhilepresentrssi=5 	#higher means slower recognition of position changes
-delaywhilepresentrssimotion=11
+delaywhilepresentrssi=10 	#higher means slower recognition of position changes
+delaywhilepresentrssimotion=19
 delaywhileabsent=10  		#higher means slower recognition when turning on 
 delaywhileverify=5 			#higher means slower verification of absence times
 delayafterconnection=5 
@@ -65,7 +65,7 @@ function notify () {
 
 
 function rssimonitor () {
-
+	
 	#check for root
 	if [[ $UID -ne 0 ]]; then
 		return
