@@ -115,11 +115,9 @@ function rssimonitor () {
 				sleep $delaywhilepresentrssi
 				continue
 			else
-				rssilast=$(echo "$rssi")
 				thischange=$(date +%s)
 				timedifference=$((thischange-lastchange))
 				rssidifference=$(((rssi-rssilast)*(rssi-rssilast)))
-
 				notify "$rssi $rssilast $timedifference $rssidifference"
 
 				if [ $rssidifference -gt 15 ] && [ $timedifference -gt $delaywhilepresentrssimotion ]; then 
