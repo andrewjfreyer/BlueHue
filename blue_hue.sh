@@ -98,7 +98,7 @@ function rssimonitor () {
             break #Bluetooth has disconnected; re-verify in previous loop
         fi
 
-        notify "$rssi - $rssilast"
+        notify "$rssi - $rssilast || $rssiresult"
 
         #various commands based on RSSI ranges
 		if [ $bluetoothconnected = "1" ]; then
