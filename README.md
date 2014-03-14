@@ -64,7 +64,6 @@ Turn [Philips Hue lights](http://www.meethue.com) on with a [Raspberry Pi](http:
   
 6. Add information to Credentials file
 
-  `echo "device_type username mac_address bluetooth_name [pushover_user] [pushover_token]" > hue_credentials`
 
 7. Reboot or Launch
 
