@@ -73,7 +73,7 @@ function rssimonitor () {
 	#Internal Connection status
 	bluetoothconnected=0
 	rssi=0
-	rssilast=1
+	rssilast=40
 
 	#motion prediction
 	lastchange=$(date +%s)
@@ -112,10 +112,11 @@ function rssimonitor () {
 			else
 				thischange=$(date +%s)
 				timedifference=$((thischange-lastchange))
-				rssidifference=$((rssi-rssilast))
+				rssidifference=$(((rssi-rssilast)*(rssi-rssilast)/(rssi-rssilast)/(rssi-rssilast))
+
+				notify "Time since: $timedifference $rssidifference"
 
 				if [ $rssidifference -gt 2 ]; then 
-					notify "Time since: $timedifference $rssidifference"
 					lastchange=$(date +%s)
 	
 					if [ $rssi -gt $rssilast ]; then
