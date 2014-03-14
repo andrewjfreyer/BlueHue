@@ -73,7 +73,7 @@ function rssimonitor () {
 	#Internal Connection status
 	bluetoothconnected=0
 	rssi=0
-	rssilast=40
+	rssilast=99
 
 	#motion prediction
 	lastchange=$(date +%s)
@@ -92,7 +92,7 @@ function rssimonitor () {
 		#should be connected here
 		rssiresult=$(hcitool rssi $macaddress)
 		bluetoothconnected=$(echo $rssiresult | grep -c "RSSI return value")
-
+		
 		rssi=$(echo $rssiresult | sed 's/RSSI return value: //g')
 
 		#If still not connected
@@ -116,9 +116,9 @@ function rssimonitor () {
 
 				notify "Time since: $timedifference $rssidifference $rssilast $rssi"
 
-				if [ $rssidifference -gt 2 ]; then 
-					rssilast=$(echo "$rssi")
+				if [ $rssidifference -gt 1 ] || [ $rssilast -eq 99 ] ; then 
 					lastchange=$(date +%s)
+					rssilast=$(echo "$rssi")
 	
 					if [ $rssi -gt $rssilast ]; then
 						notify "Bluetooth Proximity: ~ Further Away"
