@@ -103,7 +103,7 @@ function rssimonitor () {
 		rssiconstantA=50
 		rssiconstantN=2
 
-		notify $(( 10 ** ((-rssi+rssiconstantA)/(10*rssiconstantN)) ))
+		notify $(( 3 ** ((-rssi+rssiconstantA)/(10*rssiconstantN)) ))
 
 		sleep 5
 		continue
