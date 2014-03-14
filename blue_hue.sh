@@ -4,7 +4,7 @@
 # ----------------------------------------------------------------------------------------
 
 # Written by Andrew J Freyer
-# Version 1.4
+# Version 1.5
 
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE & VAR SETTING
@@ -66,8 +66,8 @@ function notify () {
 function rssimonitor () {
 
 	#check for root
-	if [[ $UID -ne 0 ]]; then
-		notify "root required for rssi"
+	if [[ $UID -ne 0 ]] || [ ! $1 ] ; then
+		log "not monitoring rssi"
 		return
 	fi
 
@@ -89,7 +89,7 @@ function rssimonitor () {
 		#should be connected here
 		rssiresult=$(hcitool rssi $macaddress)
 		bluetoothconnected=$(echo $rssiresult | grep -c "RSSI return value")
-		rssilast=$rssi
+		rssilast="$rssi"
 		rssi=$(echo $rssiresult | sed 's/RSSI return value: //g')
 
 		#If still not connected
@@ -156,13 +156,13 @@ while ($1); do
 				notify "All lights have been turned on."
 				hue_allon_custom
 				laststatus=1
-				rssimonitor true
+				rssimonitor $2
 			else
 				#bluetooth device remains present.
 				defaultwait=$delaywhilepresent
 
 				#missed the connection before leaving, try again
-				rssimonitor true
+				rssimonitor $2
 
 			fi
 			break
