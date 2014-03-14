@@ -113,9 +113,9 @@ function rssimonitor () {
 				thischange=$(date +%s)
 				timedifference=$((thischange-lastchange))
 				rssidifference=$((rssi-rssilast))
-				
+
 				if [ $rssidifference -gt 3 ]; then 
-					notify "Time since: $timedifference"
+					notify "Time since: $timedifference $rssidifference"
 					lastchange=$(date +%s)
 	
 					if [ $rssi -gt $rssilast ]; then
