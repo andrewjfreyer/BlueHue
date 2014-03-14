@@ -57,12 +57,9 @@ function notify () {
 	fi
 }
 
-
-
 # ----------------------------------------------------------------------------------------
 # Enter Connection Monitor Mode : Connected
 # ----------------------------------------------------------------------------------------
-
 
 function rfcommconnect () {
 	#check for root
@@ -70,8 +67,8 @@ function rfcommconnect () {
 		return
 	fi
 
-	rfcomm release $macaddress
-	rfcomm connect 0 $macaddress 1  # will wait until no longer connected
+	rfcomm release $macaddress 2>&1 > /dev/null
+	rfcomm connect 0 $macaddress 1 2>&1 > /dev/null # will wait until no longer connected
 }
 
 # ----------------------------------------------------------------------------------------
