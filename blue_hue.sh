@@ -75,6 +75,9 @@ function rssimonitor () {
 	rssi=-99
 	rssilast=1
 
+	#motion prediction
+	lastchange=$(date +%s)
+
 	#Command loop:
 	while [ 1 ];  do
 		#if disconnected, attempt to connect & verify status
@@ -99,8 +102,6 @@ function rssimonitor () {
             break #Bluetooth has disconnected; re-verify in previous loop
         fi
 
-        notify "$rssi - $rssilast || $rssiresult"
-
         #various commands based on RSSI ranges
 		if [ $bluetoothconnected = "1" ]; then
 
@@ -108,14 +109,21 @@ function rssimonitor () {
 				#very close within 0-10 feet line of sight
 				sleep $delaywhilepresentrssi
 				continue
+			else
+				thischange=$(date +%s)
+				difference=$((thischange-lastchange))
+				lastchange=$(date +%s)
 
-			elif [ $rssi -gt $rssilast ]; then
-				#medium close 10 - 25 feet line of sight
-				notify "Bluetooth Proximity: Further Away"
-			
-			elif [ $rssi -lt $rssilast ]; then
-				#medium close 10 - 25 feet line of sight
-				notify "Bluetooth Proximity: ~ Closer"
+				notify "Time since: $difference"
+
+				if [ $rssi -gt $rssilast ]; then
+					#medium close 10 - 25 feet line of sight
+					notify "Bluetooth Proximity: ~ Further Away"
+				
+				elif [ $rssi -lt $rssilast ]; then
+					#medium close 10 - 25 feet line of sight
+					notify "Bluetooth Proximity: ~ Closer"
+				fi
 			fi
 		fi
 
