@@ -65,11 +65,11 @@ function notify () {
 # ----------------------------------------------------------------------------------------
 
 notify "BlueHue Proxmity Started."
+defaultwait=0
+laststatus=-1
 
 while ($1); do
-	defaultwait=0
-	laststatus=-1
-
+	
 	for repetition in $(seq 1 $verifyrepetitions); 
 	do 
 		bluetoothscanresults=$(hcitool name "$macaddress" 2>&1)		
