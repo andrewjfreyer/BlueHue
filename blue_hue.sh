@@ -4,7 +4,7 @@
 # ----------------------------------------------------------------------------------------
 
 # Written by Andrew J Freyer
-# Version 1.71
+# Version 1.72
 
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE & VAR SETTING
@@ -58,20 +58,6 @@ function notify () {
 }
 
 # ----------------------------------------------------------------------------------------
-# Enter Connection Monitor Mode : Connected
-# ----------------------------------------------------------------------------------------
-
-function rfcommconnect () {
-	#check for root
-	if [[ $UID -ne 0 ]]; then
-		return
-	fi
-
-	rfcomm release $macaddress 2>&1 > /dev/null
-	rfcomm connect 0 $macaddress 1 2>&1 > /dev/null # will wait until no longer connected
-}
-
-# ----------------------------------------------------------------------------------------
 # INFINITE LOOP
 # ----------------------------------------------------------------------------------------
 
@@ -106,13 +92,9 @@ while ($1); do
 				notify "All lights have been turned on."
 				hue_allon_custom
 				laststatus=1
-				rfcommconnect
 			else
 				#bluetooth device remains present.
 				defaultwait=$delaywhilepresent
-
-				#missed the connection before leaving, try again
-				rfcommconnect
 			fi
 			break
 		else
