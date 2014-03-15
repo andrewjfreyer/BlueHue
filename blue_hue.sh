@@ -1,18 +1,34 @@
 #!/bin/bash
-# ----------------------------------------------------------------------------------------
-# VERSION INFORMATION
-# ----------------------------------------------------------------------------------------
 
+# ----------------------------------------------------------------------------------------
+# GENERAL INFORMATION
+# ----------------------------------------------------------------------------------------
+#
+# BlueHue - Bluetooth Proximity Switch for Hue Ligts
 # Written by Andrew J Freyer
-# Version 1.72
+# Version 1.8
+# GNU General Public License
+#
+# ----------------------------------------------------------------------------------------
+#
+# ----------------------------------------------------------------------------------------
 
 # ----------------------------------------------------------------------------------------
-# BASH API / NOTIFICATION API INCLUDE & VAR SETTING
+# BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
 
 source /home/pi/hue/support/hue_bashlibrary.sh
 source /home/pi/hue/support/credentials
 NOTIFICATIONSOURCE=/home/pi/hue/support/notification.sh ; [ -f $NOTIFICATIONSOURCE ] && source $NOTIFICATIONSOURCE
+
+# ----------------------------------------------------------------------------------------
+# Set Program Variables
+# ----------------------------------------------------------------------------------------
+
+delaywhilepresent=60 			#higher means slower turn off when leaving
+delaywhileabsent=10  			#higher means slower recognition when turning on 
+delaywhileverify=5 				#higher means slower verification of absence times
+verifyrepetitions=7 			#lower means more false rejection 
 
 # ----------------------------------------------------------------------------------------
 # Credential Information Verification
@@ -27,25 +43,12 @@ fi
 # GET THE IP OF THE BRIDGE
 # ----------------------------------------------------------------------------------------
 
-#Find the IP Address of the Bridge
 ip=$(cat /home/pi/hue/support/hue_ip)
 
 if [ -z "$ipaddress" ]; then 
 	ip=$(curl -s http://www.meethue.com/api/nupnp | grep -ioE "[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}")
 	echo "$ip" > /home/pi/hue/support/hue_ip
 fi
-
-# ----------------------------------------------------------------------------------------
-# DEFAULTS
-# ----------------------------------------------------------------------------------------
-
-delaywhilepresent=60 			#higher means slower turn off when leaving
-delaywhileabsent=10  			#higher means slower recognition when turning on 
-delaywhileverify=5 				#higher means slower verification of absence times
-delayafterconnection=5 
-defaultwait=20
-verifyrepetitions=2 		#lower means more false rejection 
-laststatus=99
 
 # ----------------------------------------------------------------------------------------
 # Notification
@@ -58,12 +61,15 @@ function notify () {
 }
 
 # ----------------------------------------------------------------------------------------
-# INFINITE LOOP
+# PROGRAM LOOP
 # ----------------------------------------------------------------------------------------
 
 notify "BlueHue Proxmity Started."
 
 while ($1); do
+	defaultwait=0
+	laststatus=-1
+
 	for repetition in $(seq 1 $verifyrepetitions); 
 	do 
 		bluetoothscanresults=$(hcitool name "$macaddress" 2>&1)		
