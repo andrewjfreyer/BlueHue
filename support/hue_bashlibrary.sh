@@ -20,6 +20,7 @@ cmdname=''
 lastlog=''
 result_hue_is_on=-1
 loglevel=0
+groupcount=8
 
 # GENERIC WRAPPERS
 
@@ -246,7 +247,11 @@ function hue_alloff {
 
 function hue_allon {
 	if [ ! -z $1 ] && [ ! -z $2 ] && [ ! -z $3 ] && [ ! -z $4 ]; then 
- 		hue_put "{ \"on\": true, \"hue\": $1, \"sat\": $2, \"bri\": $3, \"transitiontime\": $4 }" "groups/0/action"
+		for i in $(seq 1 $groupcount)
+		do
+ 			hue_put "{ \"on\": true, \"hue\": $1, \"sat\": $2, \"bri\": $3, \"transitiontime\": $4 }" "groups/$i/action"
+ 			sleep 0.66
+ 		done 
  	else 
  		hue_put "{ \"on\": true }" "groups/0/action"
  	fi	
@@ -265,40 +270,33 @@ function hue_allon_custom () {
 	hour=$(date "+%H")
 
 	if ((4<=hour && hour<=6)); then
-		#early morning -> light blue at low brighness
 		bri=127
 		hue=46920
 		sat=20
 	elif ((7<=hour && hour<=10)); then
-		#mid morning -> warm (red) white light
-		bri=255
+		bri=230
 		hue=65535
 		sat=20
 	elif ((11<=hour && hour<=13)); then
-	    #noon  -> white
-		bri=255
+		bri=240
 		hue=0
-		sat=20
+		sat=10
 	elif ((13<=hour && hour<=16)); then
-	    #afternoon -> cool (blue) white light
 		bri=255
 		hue=46920
 		sat=20
 	elif ((17<=hour && hour<=21)); then
-	    	#evening -> cool (blue) white light
 	    bri=230
 		hue=46920
-		sat=20
+		sat=30
 	elif ((21<=hour && hour<=23)); then
-	    	#night -> cool (blue) white light; moon
 		bri=160
 		hue=46920
-		sat=20
+		sat=40
 	elif ((0<=hour && hour<=3)); then
-	    	#late night -> cool (blue) white light; dim moon
 		bri=130
 		hue=46920
-		sat=20
+		sat=50
 	fi
 
 	#by default all lights will be turned on or off (i.e., group0)

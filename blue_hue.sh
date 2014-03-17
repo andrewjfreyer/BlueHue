@@ -96,7 +96,7 @@ while ($1); do
 			if [ "$laststatus" != 1 ]; then  
 				#bluetooth device arrived
 				notify "All lights have been turned on."
-				hue_allon_custom
+				type hue_allon_custom
 				laststatus=1
 			else
 				#bluetooth device remains present.
