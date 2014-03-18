@@ -28,6 +28,7 @@ NOTIFICATIONSOURCE=/home/pi/hue/support/notification.sh ; [ -f $NOTIFICATIONSOUR
 delaywhilepresent=60 			#higher means slower turn off when leaving
 delaywhileabsent=10  			#higher means slower recognition when turning on 
 delaywhileverify=5 				#higher means slower verification of absence times
+defaultdelaybeforeon=1.5		#higher means slower turn on
 verifyrepetitions=7 			#lower means more false rejection 
 
 # ----------------------------------------------------------------------------------------
@@ -79,7 +80,7 @@ while ($1); do
 			if [ "$laststatus" != 0 ]; then  
 				if [ "$repetition" -eq $verifyrepetitions ] ; then 
 					#bluetooth device left
-					notify "All lights have been turned off."
+					notify "All light groups are off."
 					hue_alloff
 					laststatus=0
 					defaultwait=$delaywhileabsent
@@ -95,7 +96,7 @@ while ($1); do
 		elif [ "$bluetoothdevicepresent" == "1" ]; then 
 			if [ "$laststatus" != 1 ]; then  
 				#bluetooth device arrived
-				notify "All lights have been turned on."
+				sleep $defaultdelaybeforeon 
 				hue_allon_custom
 				laststatus=1
 			else

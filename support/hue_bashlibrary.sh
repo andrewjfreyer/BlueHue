@@ -20,7 +20,9 @@ cmdname=''
 lastlog=''
 result_hue_is_on=-1
 loglevel=0
-groupcount=8
+
+#Group activation order
+grouporder="4 1 6 8 7 3 2"
 
 # GENERIC WRAPPERS
 
@@ -240,17 +242,21 @@ function hue_onoff() {
 
 function hue_alloff {
 	#30 seconds to turn off
-	hue_put "{ \"on\": false, \"transitiontime\": 100 }" "groups/0/action"
+	for i in $grouporder
+	do
+		hue_put "{ \"on\": false, \"transitiontime\": 100 }" "groups/$i/action"
+		sleep 0.77
+	done
 }
 
 # Function hue_allof: turn all lights on (group 0)
 
 function hue_allon {
 	if [ ! -z $1 ] && [ ! -z $2 ] && [ ! -z $3 ] && [ ! -z $4 ]; then 
-		for i in $(seq 1 $groupcount)
+		for i in $grouporder
 		do
  			hue_put "{ \"on\": true, \"hue\": $1, \"sat\": $2, \"bri\": $3, \"transitiontime\": $4 }" "groups/$i/action"
- 			sleep 0.66
+ 			sleep 0.88
  		done 
  	else 
  		hue_put "{ \"on\": true }" "groups/0/action"
