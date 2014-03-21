@@ -256,7 +256,7 @@ function hue_allon {
 		for i in $grouporder
 		do
  			hue_put "{ \"on\": true, \"hue\": $1, \"sat\": $2, \"bri\": $3, \"transitiontime\": $4 }" "groups/$i/action"
- 			sleep 0.88
+ 			sleep 0.9
  		done 
  	else 
  		hue_put "{ \"on\": true }" "groups/0/action"
