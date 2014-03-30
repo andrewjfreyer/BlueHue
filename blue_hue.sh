@@ -6,7 +6,7 @@
 #
 # BlueHue - Bluetooth Proximity Switch for Hue Ligts
 # Written by Andrew J Freyer
-# Version 1.8
+# Version 1.81
 # GNU General Public License
 #
 # ----------------------------------------------------------------------------------------
@@ -27,7 +27,11 @@ NOTIFICATIONSOURCE=/home/pi/hue/support/notification.sh ; [ -f $NOTIFICATIONSOUR
 
 delaywhilepresent=60 			#higher means slower turn off when leaving
 delaywhileabsent=10  			#higher means slower recognition when turning on 
+<<<<<<< HEAD
 delaywhileverify=10 			#higher means slower verification of absence times
+=======
+delaywhileverify=5 				#higher means slower verification of absence times
+>>>>>>> FETCH_HEAD
 defaultdelaybeforeon=3.5		#higher means slower turn on
 verifyrepetitions=7 			#lower means more false rejection 
 
@@ -80,7 +84,7 @@ while ($1); do
 			if [ "$laststatus" != 0 ]; then  
 				if [ "$repetition" -eq $verifyrepetitions ] ; then 
 					#bluetooth device left
-					notify "All light groups are off."
+					notify "All specified light groups are off."
 					hue_alloff
 					laststatus=0
 					defaultwait=$delaywhileabsent
@@ -96,6 +100,7 @@ while ($1); do
 		elif [ "$bluetoothdevicepresent" == "1" ]; then 
 			if [ "$laststatus" != 1 ]; then  
 				#bluetooth device arrived
+				notify "All specified light groups are turning on."
 				sleep $defaultdelaybeforeon 
 				hue_allon_custom
 				laststatus=1
