@@ -27,8 +27,8 @@ NOTIFICATIONSOURCE=/home/pi/hue/support/notification.sh ; [ -f $NOTIFICATIONSOUR
 
 delaywhilepresent=60 			#higher means slower turn off when leaving
 delaywhileabsent=10  			#higher means slower recognition when turning on 
-delaywhileverify=5 				#higher means slower verification of absence times
-defaultdelaybeforeon=1.5		#higher means slower turn on
+delaywhileverify=10 			#higher means slower verification of absence times
+defaultdelaybeforeon=3.5		#higher means slower turn on
 verifyrepetitions=7 			#lower means more false rejection 
 
 # ----------------------------------------------------------------------------------------
@@ -69,10 +69,10 @@ notify "BlueHue Proxmity Started."
 defaultwait=0
 laststatus=-1
 
-while ($1); do
-	
+while ($1); do	
 	for repetition in $(seq 1 $verifyrepetitions); 
 	do 
+		
 		bluetoothscanresults=$(hcitool name "$macaddress" 2>&1)		
 		bluetoothdevicepresent=$(echo "$bluetoothscanresults" | grep -ic "$devicename")
 
