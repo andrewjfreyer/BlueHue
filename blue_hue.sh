@@ -27,12 +27,8 @@ NOTIFICATIONSOURCE=/home/pi/hue/support/notification.sh ; [ -f $NOTIFICATIONSOUR
 
 delaywhilepresent=60 			#higher means slower turn off when leaving
 delaywhileabsent=10  			#higher means slower recognition when turning on 
-<<<<<<< HEAD
 delaywhileverify=10 			#higher means slower verification of absence times
-=======
-delaywhileverify=5 				#higher means slower verification of absence times
->>>>>>> FETCH_HEAD
-defaultdelaybeforeon=3.5		#higher means slower turn on
+defaultdelaybeforeon=4.5		#higher means slower turn on
 verifyrepetitions=7 			#lower means more false rejection 
 
 # ----------------------------------------------------------------------------------------
