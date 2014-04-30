@@ -6,7 +6,7 @@
 #
 # BlueHue - Bluetooth Proximity Switch for Hue Ligts
 # Written by Andrew J Freyer
-# Version 1.83
+# Version 1.84
 # GNU General Public License
 #
 # ----------------------------------------------------------------------------------------
@@ -27,15 +27,15 @@ NOTIFICATIONSOURCE=/home/pi/hue/support/notification.sh ; [ -f $NOTIFICATIONSOUR
 
 delaywhilepresent=60 			#higher means slower turn off when leaving
 delaywhileabsent=10  			#higher means slower recognition when turning on 
-delaywhileverify=10 			#higher means slower verification of absence times
-defaultdelaybeforeon=4.5		#higher means slower turn on
-verifyrepetitions=7 			#lower means more false rejection 
+delaywhileverify=6 				#higher means slower verification of absence times
+defaultdelaybeforeon=2.5		#higher means slower turn on
+verifyrepetitions=3 			#lower means more false rejection 
 
 # ----------------------------------------------------------------------------------------
 # Credential Information Verification
 # ----------------------------------------------------------------------------------------
 
-if [ -z $devicetype ] ||  [ -z $username ] || [ -z $macaddress ]; then 
+if [ -z $devicetype ] ||  [ -z $username ] || [ -z "$macaddress" ]; then 
 	echo "error: please supply credentials"
 	exit 127
 fi 
@@ -72,12 +72,10 @@ laststatus=-1
 while ($1); do	
 	for repetition in $(seq 1 $verifyrepetitions); 
 	do 
-		#reset to 0
 		bluetoothscanresults=""
 
 		for searchdeviceaddress in $macaddress; 
 		do 
-			#scan for each bt device
 			bluetoothscanresults="$bluetoothscanresults$(hcitool name "$searchdeviceaddress" 2>&1)"
 		done
 
