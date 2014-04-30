@@ -30,21 +30,7 @@ grouporder="4 1 6 8 7 3 2"
 # $1...loglevel
 # $2...output
 function log() {	
-	if (( $loglevel > 0 ))
-	then
-		date=`date`
-
-		if (( $1 >= $loglevel ))
-		then
-			if (( $1 >= 3 && $loglevel > 1 ))  					# in case of loglevel 3 and an error also output the last gossip/verbose statement to find the source of trouble
-			then
-				printf "$cmdname - $date [lastmsg]: $lastlog \n\n"
-			fi
-			printf "$cmdname - $date [$1]: $2"
-			printf "\n\n"
-		fi
-		lastlog=$2												# store for usage if we encounter an error later
-	fi
+	return;
 }
 # A little helper, depending on loglevel, it sets a gossip log OR just an error log in case of a request that did not result in an success
 function log_error() {
@@ -244,7 +230,7 @@ function hue_alloff {
 	#30 seconds to turn off
 	for i in $grouporder
 	do
-		hue_put "{ \"on\": false, \"transitiontime\": 100 }" "groups/$i/action"
+		hue_put "{ \"on\": false, \"transitiontime\": 20 }" "groups/$i/action"
 		sleep 0.77
 	done
 }
@@ -276,11 +262,11 @@ function hue_allon_custom () {
 	hour=$(date "+%H")
 
 	if ((4<=hour && hour<=6)); then
-		bri=127
+		bri=250
 		hue=46920
 		sat=20
 	elif ((7<=hour && hour<=10)); then
-		bri=230
+		bri=250
 		hue=65535
 		sat=20
 	elif ((11<=hour && hour<=13)); then

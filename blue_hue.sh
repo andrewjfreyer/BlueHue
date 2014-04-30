@@ -6,7 +6,7 @@
 #
 # BlueHue - Bluetooth Proximity Switch for Hue Ligts
 # Written by Andrew J Freyer
-# Version 1.81
+# Version 1.83
 # GNU General Public License
 #
 # ----------------------------------------------------------------------------------------
@@ -35,7 +35,7 @@ verifyrepetitions=7 			#lower means more false rejection
 # Credential Information Verification
 # ----------------------------------------------------------------------------------------
 
-if [ -z $devicetype ] ||  [ -z $username ] || [ -z $macaddress ] || [ -z $devicename ]; then 
+if [ -z $devicetype ] ||  [ -z $username ] || [ -z $macaddress ]; then 
 	echo "error: please supply credentials"
 	exit 127
 fi 
@@ -72,9 +72,16 @@ laststatus=-1
 while ($1); do	
 	for repetition in $(seq 1 $verifyrepetitions); 
 	do 
-		
-		bluetoothscanresults=$(hcitool name "$macaddress" 2>&1)		
-		bluetoothdevicepresent=$(echo "$bluetoothscanresults" | grep -ic "$devicename")
+		#reset to 0
+		bluetoothscanresults=""
+
+		for searchdeviceaddress in $macaddress; 
+		do 
+			#scan for each bt device
+			bluetoothscanresults="$bluetoothscanresults$(hcitool name "$searchdeviceaddress" 2>&1)"
+		done
+
+		bluetoothdevicepresent=$(echo "$bluetoothscanresults" | grep -icE "[a-z0-9]")
 
 		if [ "$bluetoothscanresults" == "" ]; then
 			if [ "$laststatus" != 0 ]; then  
