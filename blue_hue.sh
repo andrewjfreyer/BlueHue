@@ -6,7 +6,7 @@
 #
 # BlueHue - Bluetooth Proximity Switch for Hue Ligts
 # Written by Andrew J Freyer
-# Version 1.84
+# Version 1.85
 # GNU General Public License
 #
 # ----------------------------------------------------------------------------------------
@@ -25,11 +25,12 @@ NOTIFICATIONSOURCE=/home/pi/hue/support/notification.sh ; [ -f $NOTIFICATIONSOUR
 # Set Program Variables
 # ----------------------------------------------------------------------------------------
 
-delaywhilepresent=60 			#higher means slower turn off when leaving
-delaywhileabsent=10  			#higher means slower recognition when turning on 
+delaywhilepresent=80 			#higher means slower turn off when leaving
+delaywhileabsent=12 			#higher means slower recognition when turning on 
 delaywhileverify=6 				#higher means slower verification of absence times
-defaultdelaybeforeon=2.5		#higher means slower turn on
-verifyrepetitions=3 			#lower means more false rejection 
+defaultdelaybeforeon=1.5		#higher means slower turn on
+delaybetweenscan=3				#advised for bluetooth hardware 
+verifyrepetitions=7 			#lower means more false rejection 
 
 # ----------------------------------------------------------------------------------------
 # Credential Information Verification
@@ -77,9 +78,17 @@ while ($1); do
 		for searchdeviceaddress in $macaddress; 
 		do 
 			bluetoothscanresults="$bluetoothscanresults$(hcitool name "$searchdeviceaddress" 2>&1)"
+			bluetoothdevicepresent=$(echo "$bluetoothscanresults" | grep -icE "[a-z0-9]")
+			
+			if [ "$bluetoothscanresults" != "" ]; then
+ 				#if at least one device was found continue
+ 				break
+ 			else
+ 				#else, continue with scan list
+				sleep $delaybetweenscan
+ 			fi
 		done
 
-		bluetoothdevicepresent=$(echo "$bluetoothscanresults" | grep -icE "[a-z0-9]")
 
 		if [ "$bluetoothscanresults" == "" ]; then
 			if [ "$laststatus" != 0 ]; then  
@@ -100,7 +109,7 @@ while ($1); do
 
 		elif [ "$bluetoothdevicepresent" == "1" ]; then 
 			if [ "$laststatus" != 1 ]; then  
-				#bluetooth device arrived
+				#bluetooth device arrived, but a status has been determined
 				notify "All specified light groups are turning on."
 				sleep $defaultdelaybeforeon 
 				hue_allon_custom
