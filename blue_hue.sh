@@ -6,7 +6,7 @@
 #
 # BlueHue - Bluetooth Proximity Switch for Hue Ligts
 # Written by Andrew J Freyer
-# Version 1.85
+# Version 1.86
 # GNU General Public License
 #
 # ----------------------------------------------------------------------------------------
@@ -31,6 +31,7 @@ delaywhileverify=6 				#higher means slower verification of absence times
 defaultdelaybeforeon=1.5		#higher means slower turn on
 delaybetweenscan=3				#advised for bluetooth hardware 
 verifyrepetitions=7 			#lower means more false rejection 
+ip=0.0.0.0 						#IP address filler
 
 # ----------------------------------------------------------------------------------------
 # Credential Information Verification
@@ -44,13 +45,15 @@ fi
 # ----------------------------------------------------------------------------------------
 # GET THE IP OF THE BRIDGE
 # ----------------------------------------------------------------------------------------
+function refreshIPAddress () {
+	ip=$(cat /home/pi/hue/support/hue_ip)
+	verifybridge=$(ping -c 1 -n -t 1 "$ip" | grep -c errors)
 
-ip=$(cat /home/pi/hue/support/hue_ip)
-
-if [ -z "$ipaddress" ]; then 
-	ip=$(curl -s http://www.meethue.com/api/nupnp | grep -ioE "[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}")
-	echo "$ip" > /home/pi/hue/support/hue_ip
-fi
+	if [ -z "$ipaddress" ] || [ "$verifybridge" == "1" ]; then 
+		ip=$(curl -s http://www.meethue.com/api/nupnp | grep -ioE "[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}")
+		echo "$ip" > /home/pi/hue/support/hue_ip
+	fi
+}
 
 # ----------------------------------------------------------------------------------------
 # Notification
@@ -69,6 +72,8 @@ function notify () {
 notify "BlueHue Proxmity Started."
 defaultwait=0
 laststatus=-1
+
+refreshIPAddress
 
 while ($1); do	
 	for repetition in $(seq 1 $verifyrepetitions); 
@@ -89,12 +94,12 @@ while ($1); do
  			fi
 		done
 
-
 		if [ "$bluetoothscanresults" == "" ]; then
 			if [ "$laststatus" != 0 ]; then  
 				if [ "$repetition" -eq $verifyrepetitions ] ; then 
 					#bluetooth device left
 					notify "All specified light groups are off."
+					refreshIPAddress
 					hue_alloff
 					laststatus=0
 					defaultwait=$delaywhileabsent
@@ -111,6 +116,7 @@ while ($1); do
 			if [ "$laststatus" != 1 ]; then  
 				#bluetooth device arrived, but a status has been determined
 				notify "All specified light groups are turning on."
+				refreshIPAddress
 				sleep $defaultdelaybeforeon 
 				hue_allon_custom
 				laststatus=1

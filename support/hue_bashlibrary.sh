@@ -257,19 +257,19 @@ function hue_allon_custom () {
 	bri=0 #0 - 255
 	hue=0 #0 - 65535
 	sat=0 #0 - 255
-    transition=10 #in 1/10 seconds
+    transition=12 #in 1/10 seconds
 
 	hour=$(date "+%H")
 
 	if ((4<=hour && hour<=6)); then
-		bri=250
+		bri=255
 		hue=46920
 		sat=20
-	elif ((7<=hour && hour<=10)); then
-		bri=250
+	elif ((6<=hour && hour<=10)); then
+		bri=255
 		hue=65535
 		sat=20
-	elif ((11<=hour && hour<=13)); then
+	elif ((10<=hour && hour<=13)); then
 		bri=240
 		hue=0
 		sat=10
@@ -277,16 +277,21 @@ function hue_allon_custom () {
 		bri=255
 		hue=46920
 		sat=20
-	elif ((17<=hour && hour<=21)); then
-	    bri=230
+	elif ((16<=hour && hour<=21)); then
+	    bri=240
 		hue=46920
 		sat=30
 	elif ((21<=hour && hour<=23)); then
 		bri=160
 		hue=46920
 		sat=40
-	elif ((0<=hour && hour<=3)); then
-		bri=130
+	elif ((0<=hour && hour<=4)); then
+		bri=120
+		hue=46920
+		sat=50
+	else
+		#catchall
+		bri=230
 		hue=46920
 		sat=50
 	fi
