@@ -47,7 +47,7 @@ fi
 # ----------------------------------------------------------------------------------------
 function refreshIPAddress () {
 	ip=$(cat /home/pi/hue/support/hue_ip)
-	verifybridge=$(curl -m 1 "$ip/api" | grep -c "not available for resource")
+	verifybridge=$(curl -m 1 -s "$ip/api" | grep -c "not available for resource")
 
 	if [ -z "$ipaddress" ] || [ "$verifybridge" != "1" ]; then 
 		ip=$(curl -s http://www.meethue.com/api/nupnp | grep -ioE "[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}")
