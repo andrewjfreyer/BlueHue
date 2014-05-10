@@ -26,7 +26,7 @@ NOTIFICATIONSOURCE=/home/pi/hue/support/notification.sh ; [ -f $NOTIFICATIONSOUR
 # ----------------------------------------------------------------------------------------
 
 delaywhilepresent=80 			#higher means slower turn off when leaving
-delaywhileabsent=12 			#higher means slower recognition when turning on 
+delaywhileabsent=8 			#higher means slower recognition when turning on 
 delaywhileverify=6 				#higher means slower verification of absence times
 defaultdelaybeforeon=1.5		#higher means slower turn on
 delaybetweenscan=3				#advised for bluetooth hardware 
@@ -47,9 +47,9 @@ fi
 # ----------------------------------------------------------------------------------------
 function refreshIPAddress () {
 	ip=$(cat /home/pi/hue/support/hue_ip)
-	verifybridge=$(ping -c 1 -n -t 1 "$ip" | grep -c errors)
+	verifybridge=$(curl -m 1 "$ip/api" | grep -c "not available for resource")
 
-	if [ -z "$ipaddress" ] || [ "$verifybridge" == "1" ]; then 
+	if [ -z "$ipaddress" ] || [ "$verifybridge" != "1" ]; then 
 		ip=$(curl -s http://www.meethue.com/api/nupnp | grep -ioE "[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}")
 		echo "$ip" > /home/pi/hue/support/hue_ip
 	fi
