@@ -75,7 +75,7 @@ laststatus=$(hue_all_status)
 if [ $laststatus ]; then
 notify "BlueHue Proximity Started. Lights are on."
 else
-notify "BlueHue Proximity Strated. Lights are off."
+notify "BlueHue Proximity Started. Lights are off."
 fi
 
 refreshIPAddress
