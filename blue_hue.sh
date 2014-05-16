@@ -71,7 +71,7 @@ function notify () {
 
 notify "BlueHue Proxmity Started."
 defaultwait=0
-laststatus=-1
+laststatus=$(hue_all_status)
 
 refreshIPAddress
 
