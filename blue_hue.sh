@@ -69,9 +69,14 @@ function notify () {
 # PROGRAM LOOP
 # ----------------------------------------------------------------------------------------
 
-notify "BlueHue Proxmity Started."
 defaultwait=0
 laststatus=$(hue_all_status)
+
+if [ $laststatus ]; then
+notify "BlueHue Proximity Started. Lights are on."
+else
+notify "BlueHue Proximity Strated. Lights are off."
+fi
 
 refreshIPAddress
 
