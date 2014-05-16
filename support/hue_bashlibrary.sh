@@ -47,7 +47,7 @@ function log_error() {
 
 #Get the state of the zero group
 function hue_all_status () {
-      return $(curl -s $ip/api/$username/groups/0 | grep -ic "true")
+      curl -s $ip/api/$username/groups/0 | grep -ic "true"
 }
 
 # The _api_url helpers automatically start with http://yourIP/api/
