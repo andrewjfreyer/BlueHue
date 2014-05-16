@@ -6,7 +6,7 @@
 #
 # BlueHue - Bluetooth Proximity Switch for Hue Ligts
 # Written by Andrew J Freyer
-# Version 1.86
+# Version 1.87
 # GNU General Public License
 #
 # ----------------------------------------------------------------------------------------
@@ -72,7 +72,7 @@ function notify () {
 defaultwait=0
 laststatus=$(hue_all_status)
 
-if [ $laststatus ]; then
+if [ "$laststatus" == "1" ]; then
 notify "BlueHue Proximity Started. Lights are on."
 else
 notify "BlueHue Proximity Started. Lights are off."
