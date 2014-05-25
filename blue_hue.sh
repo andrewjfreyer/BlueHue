@@ -26,7 +26,7 @@ NOTIFICATIONSOURCE=/home/pi/hue/support/notification.sh ; [ -f $NOTIFICATIONSOUR
 # ----------------------------------------------------------------------------------------
 
 delaywhilepresent=80 			#higher means slower turn off when leaving
-delaywhileabsent=8 			#higher means slower recognition when turning on 
+delaywhileabsent=8 				#higher means slower recognition when turning on 
 delaywhileverify=6 				#higher means slower verification of absence times
 defaultdelaybeforeon=1.5		#higher means slower turn on
 delaybetweenscan=3				#advised for bluetooth hardware 
@@ -71,7 +71,17 @@ function notify () {
 
 notify "BlueHue Proxmity Started."
 defaultwait=0
-laststatus=-1
+laststatus=$(hue_all_status)
+
+echo "LAST STATUS $laststatus"
+
+if [ "$laststatus" == "1" ]; then
+	notify "BlueHue Proximity Started. Lights are on."
+else
+	notify "BlueHue Proximity Started. Lights are off."
+fi
+
+exit
 
 refreshIPAddress
 

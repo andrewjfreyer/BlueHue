@@ -26,6 +26,11 @@ grouporder="4 1 6 8 7 3 2"
 
 # GENERIC WRAPPERS
 
+#Get the state of the zero group
+function hue_all_status () {
+    curl -s $ip/api/$username/groups/0 | grep -ic "true"
+}
+
 # Just simple logging helper implementing different loglevels
 # $1...loglevel
 # $2...output
