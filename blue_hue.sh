@@ -69,20 +69,16 @@ function notify () {
 # PROGRAM LOOP
 # ----------------------------------------------------------------------------------------
 
-defaultwait=0
 refreshIPAddress
 
+defaultwait=0
 laststatus=$(hue_all_status)
 
-echo "LAST STATUS $laststatus"
-
 if [ "$laststatus" == "1" ]; then
-	notify "BlueHue Proximity Started. Lights are on."
+	notify "BlueHue Proximity Started. Lights are currently on."
 else
-	notify "BlueHue Proximity Started. Lights are off."
+	notify "BlueHue Proximity Started. Lights are currently off."
 fi
-
-exit
 
 while ($1); do	
 	for repetition in $(seq 1 $verifyrepetitions); 
