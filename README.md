@@ -13,7 +13,7 @@ Based on a slightly modified [hue_bashlibrary](https://github.com/markusproske/h
 
 <h2>TL;DR</h2>
 
-[![YouTube Video of Simulated Arrival](http://img.youtube.com/vi/JVYdRJQqmJA/1.jpg)](http://www.youtube.com/watch?v=JVYdRJQqmJA)
+[![YouTube Video of Simulated Arrival](http://img.youtube.com/vi/JVYdRJQqmJA/0.jpg)](http://www.youtube.com/watch?v=JVYdRJQqmJA)
 
 Turn [Philips Hue lights](http://www.meethue.com) on with a [Raspberry Pi](http://www.raspberrypi.org/) (or other server) upon arriving home and off upon leaving without the delays of IFTTT or inaccuracies and battery drain associated with geofencing via the [Philips Hue app](https://itunes.apple.com/us/app/philips-hue/id557206189?mt=8). 
 
