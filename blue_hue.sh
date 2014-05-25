@@ -75,9 +75,9 @@ defaultwait=0
 laststatus=$(hue_all_status)
 
 if [ "$laststatus" == "1" ]; then
-	notify "BlueHue Proximity Started. Lights are currently on."
+	notify "BlueHue Proximity started. Lights are currently on."
 else
-	notify "BlueHue Proximity Started. Lights are currently off."
+	notify "BlueHue Proximity started. Lights are currently off."
 fi
 
 while ($1); do	
