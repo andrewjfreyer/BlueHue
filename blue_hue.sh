@@ -70,6 +70,8 @@ function notify () {
 # ----------------------------------------------------------------------------------------
 
 defaultwait=0
+refreshIPAddress
+
 laststatus=$(hue_all_status)
 
 echo "LAST STATUS $laststatus"
@@ -83,7 +85,6 @@ fi
 exit
 
 
-refreshIPAddress
 
 while ($1); do	
 	for repetition in $(seq 1 $verifyrepetitions); 
