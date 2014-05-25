@@ -6,7 +6,7 @@
 #
 # BlueHue - Bluetooth Proximity Switch for Hue Ligts
 # Written by Andrew J Freyer
-# Version 1.87
+# Version 1.88
 # GNU General Public License
 #
 # ----------------------------------------------------------------------------------------
@@ -83,8 +83,6 @@ else
 fi
 
 exit
-
-
 
 while ($1); do	
 	for repetition in $(seq 1 $verifyrepetitions); 
