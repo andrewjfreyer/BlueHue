@@ -56,7 +56,7 @@ function refreshIPAddress () {
 }
 
 # ----------------------------------------------------------------------------------------
-# Notification
+# Notification Script... Should be modified for individual notifications
 # ----------------------------------------------------------------------------------------
 
 function notify () {
@@ -103,7 +103,7 @@ while ($1); do
 			if [ "$laststatus" != 0 ]; then  
 				if [ "$repetition" -eq $verifyrepetitions ] ; then 
 					#bluetooth device left
-					notify "All specified light groups are off."
+					notify "Goodbye."
 					refreshIPAddress
 					hue_alloff
 					laststatus=0
@@ -120,7 +120,7 @@ while ($1); do
 		elif [ "$bluetoothdevicepresent" == "1" ]; then 
 			if [ "$laststatus" != 1 ]; then  
 				#bluetooth device arrived, but a status has been determined
-				notify "All specified light groups are turning on."
+				notify "Welcome home."
 				refreshIPAddress
 				sleep $defaultdelaybeforeon 
 				hue_allon_custom
