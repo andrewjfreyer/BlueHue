@@ -88,7 +88,7 @@ while ($1); do
 
 		for searchdeviceaddress in $macaddress; 
 		do 
-			bluetoothscanresults="$bluetoothscanresults$(hcitool name "$searchdeviceaddress" 2>&1)"
+			bluetoothscanresults="$bluetoothscanresults$(hcitool name "$searchdeviceaddress" 2>&1 | grep -v 'not available')"
 			bluetoothdevicepresent=$(echo "$bluetoothscanresults" | grep -icE "[a-z0-9]")
 			
 			if [ "$bluetoothscanresults" != "" ]; then
