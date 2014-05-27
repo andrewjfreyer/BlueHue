@@ -45,6 +45,7 @@ fi
 # ----------------------------------------------------------------------------------------
 # GET THE IP OF THE BRIDGE
 # ----------------------------------------------------------------------------------------
+
 function refreshIPAddress () {
 	ip=$(cat /home/pi/hue/support/hue_ip)
 	verifybridge=$(curl -m 1 -s "$ip/api" | grep -c "not available for resource")
@@ -120,7 +121,7 @@ while ($1); do
 		elif [ "$bluetoothdevicepresent" == "1" ]; then 
 			if [ "$laststatus" != 1 ]; then  
 				#bluetooth device arrived, but a status has been determined
-				notify "Welcome home."
+				notify "Welcome home. ($bluetoothscanresults)"
 				refreshIPAddress
 				sleep $defaultdelaybeforeon 
 				hue_allon_custom
