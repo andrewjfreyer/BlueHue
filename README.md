@@ -58,8 +58,12 @@ Turn [Philips Hue lights](http://www.meethue.com) on with a [Raspberry Pi](http:
 
 5. Add init.d
 
-  `sudo echo “bash /home/pi/hue/blue_hue.sh true &” > /etc/init.d/bluehue`
-  
+  `if [ "$1" == "start" ]; then`
+
+  `      bash /home/pi/hue/blue_hue.sh true & `
+
+  `fi`
+
   `sudo chmod 755 /etc/init.d/bluehue`
   
   `sudo update-rc.d bluehue defaults`
