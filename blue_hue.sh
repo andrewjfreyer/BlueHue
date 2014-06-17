@@ -16,7 +16,7 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=1.896
+Version=1.897
 source /home/pi/hue/support/hue_bashlibrary.sh
 source /home/pi/hue/support/credentials
 NOTIFICATIONSOURCE=/home/pi/hue/support/notification.sh ; [ -f $NOTIFICATIONSOURCE ] && source $NOTIFICATIONSOURCE
@@ -77,9 +77,9 @@ laststatus=$(curl -s $ip/api/$username/ | tr "{" "\n" | grep -ioc "\"on\":true")
 
 
 if [ "$laststatus" != "0" ]; then
-	notify "BlueHue (v. $Version) Proximity started with $laststatus light(s) on."
+	notify "BlueHue Proximity (v. $Version) started with $laststatus light(s) on."
 else
-	notify "BlueHue (v. $Version) Proximity started. Lights are currently off."
+	notify "BlueHue Proximity (v. $Version) started with all lights off."
 fi
 
 while ($1); do	
