@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 # ----------------------------------------------------------------------------------------
@@ -15,7 +16,7 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=1.895
+Version=1.896
 source /home/pi/hue/support/hue_bashlibrary.sh
 source /home/pi/hue/support/credentials
 NOTIFICATIONSOURCE=/home/pi/hue/support/notification.sh ; [ -f $NOTIFICATIONSOURCE ] && source $NOTIFICATIONSOURCE
@@ -72,10 +73,11 @@ function notify () {
 refreshIPAddress
 
 defaultwait=0
-laststatus=$(curl -s $ip/api/$username/ | grep -ic "\"on\":true")
+laststatus=$(curl -s $ip/api/$username/ | tr "{" "\n" | grep -ioc "\"on\":true")
 
-if [ "$laststatus" == "1" ]; then
-	notify "BlueHue (v. $Version) Proximity started. At least one light is on."
+
+if [ "$laststatus" != "0" ]; then
+	notify "BlueHue (v. $Version) Proximity started with $laststatus light(s) on."
 else
 	notify "BlueHue (v. $Version) Proximity started. Lights are currently off."
 fi
