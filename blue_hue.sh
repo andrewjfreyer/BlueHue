@@ -51,7 +51,7 @@ function refreshIPAddress () {
 	verifybridge=$(curl -m 1 -s "$ip/api" | grep -c "not available for resource")
 
 	if [ -z "$ipaddress" ] || [ "$verifybridge" != "1" ]; then 
-		ip=$(curl -s http://www.meethue.com/api/nupnp | grep -ioE "[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}")
+		ip=$(curl -s -L http://www.meethue.com/api/nupnp | grep -ioE "[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}")
 		echo "$ip" > /home/pi/hue/support/hue_ip
 	fi
 }
@@ -74,6 +74,10 @@ refreshIPAddress
 
 defaultwait=0
 laststatus=$(hue_all_status)
+
+echo "$laststatus"
+
+exit
 
 if [ "$laststatus" == "1" ]; then
 	notify "BlueHue Proximity started. Lights are currently on."
