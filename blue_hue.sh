@@ -6,7 +6,6 @@
 #
 # BlueHue - Bluetooth Proximity Switch for Hue Ligts
 # Written by Andrew J Freyer
-# Version 1.894
 # GNU General Public License
 #
 # ----------------------------------------------------------------------------------------
@@ -16,7 +15,7 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-
+Version=1.894
 source /home/pi/hue/support/hue_bashlibrary.sh
 source /home/pi/hue/support/credentials
 NOTIFICATIONSOURCE=/home/pi/hue/support/notification.sh ; [ -f $NOTIFICATIONSOURCE ] && source $NOTIFICATIONSOURCE
@@ -75,14 +74,10 @@ refreshIPAddress
 defaultwait=0
 laststatus=$(curl -s $ip/api/$username/ | grep -ic "\"on\":true")
 
-echo "$laststatus"
-
-exit
-
 if [ "$laststatus" == "1" ]; then
-	notify "BlueHue Proximity started. Lights are currently on."
+	notify "BlueHue (v. $Version) Proximity started. Lights are currently on."
 else
-	notify "BlueHue Proximity started. Lights are currently off."
+	notify "BlueHue (v. $Version) Proximity started. Lights are currently off."
 fi
 
 while ($1); do	
