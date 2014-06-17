@@ -6,7 +6,7 @@
 #
 # BlueHue - Bluetooth Proximity Switch for Hue Ligts
 # Written by Andrew J Freyer
-# Version 1.893
+# Version 1.894
 # GNU General Public License
 #
 # ----------------------------------------------------------------------------------------
@@ -73,7 +73,7 @@ function notify () {
 refreshIPAddress
 
 defaultwait=0
-laststatus=$(hue_all_status)
+laststatus=$(curl -s $ip/api/$username/ | grep -ic "\"on\":true")
 
 echo "$laststatus"
 
