@@ -28,7 +28,7 @@ grouporder="4 1 6 8 7 3 2"
 
 #Get the state of the zero group
 function hue_all_status () {
-    curl -s $ip/api/$username/ | grep -ico '"on":true'
+    curl -s $ip/api/$username/ | grep -ic "\"on\":true"
 }
 
 # Just simple logging helper implementing different loglevels
