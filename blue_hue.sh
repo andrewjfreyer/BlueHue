@@ -6,7 +6,7 @@
 #
 # BlueHue - Bluetooth Proximity Switch for Hue Ligts
 # Written by Andrew J Freyer
-# Version 1.891
+# Version 1.893
 # GNU General Public License
 #
 # ----------------------------------------------------------------------------------------
