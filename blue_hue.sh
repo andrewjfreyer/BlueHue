@@ -26,11 +26,11 @@ NOTIFICATIONSOURCE=/home/pi/hue/support/notification.sh ; [ -f $NOTIFICATIONSOUR
 # ----------------------------------------------------------------------------------------
 
 delaywhilepresent=80 			#higher means slower turn off when leaving
-delaywhileabsent=8 				#higher means slower recognition when turning on 
-delaywhileverify=6 				#higher means slower verification of absence times
-defaultdelaybeforeon=1.5		#higher means slower turn on
+delaywhileabsent=6 				#higher means slower recognition when turning on 
+delaywhileverify=3 				#higher means slower verification of absence times
+defaultdelaybeforeon=0		#higher means slower turn on
 delaybetweenscan=3				#advised for bluetooth hardware 
-verifyrepetitions=7 			#lower means more false rejection 
+verifyrepetitions=3 			#lower means more false rejection 
 ip=0.0.0.0 						#IP address filler
 
 # ----------------------------------------------------------------------------------------

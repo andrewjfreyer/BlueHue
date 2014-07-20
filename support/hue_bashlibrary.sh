@@ -22,7 +22,7 @@ result_hue_is_on=-1
 loglevel=0
 
 #Group activation order
-grouporder="4 1 6 8 7 3 2"
+grouporder="1 2 5 6 4 3"
 
 # Just simple logging helper implementing different loglevels
 # $1...loglevel
