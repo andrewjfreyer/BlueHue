@@ -47,14 +47,9 @@ Turn [Philips Hue lights](http://www.meethue.com) on with a [Raspberry Pi](http:
 
   `sudo hciconfig hci0 name 'BlueHueProx'`
 
+4. Connect the Portable Bluetooth Device:
 
-4. Connect the Portable Bluetooth Device to the server running BlueHue, choosing a pin number:
-
-    `sudo bluetooth-agent {PIN NUMBER} {MAC ADDRESS}`
-
-    *NOTE:* If you have issues adding the device, be sure that you have removed all traces of a particular MAC via:
-
-    `sudo bluez-test-device remove {MACADDRESS}`
+    `sudo l2ping MACADDRESS`
 
 5. Add init.d
 
