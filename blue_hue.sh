@@ -14,13 +14,14 @@
 # ----------------------------------------------------------------------------------------
 
 # ----------------------------------------------------------------------------------------
-# to simple pair: sudo l2ping MAC (with device discoverable)
+# Simple pair: 			sudo l2ping MAC (with device discoverable)
+# Enable simple pair: 	sudo hciconfig hci0 sspmode 0
 # ----------------------------------------------------------------------------------------
 
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=1.9
+Version=2.0
 source /home/pi/hue/support/hue_bashlibrary.sh
 source /home/pi/hue/support/credentials
 NOTIFICATIONSOURCE=/home/pi/hue/support/notification.sh ; [ -f $NOTIFICATIONSOURCE ] && source $NOTIFICATIONSOURCE
@@ -91,8 +92,10 @@ while ($1); do
 	do 
 		bluetoothscanresults=""
 
-		for searchdeviceaddress in $macaddress; 
+		for searchdeviceaddress in $"${macaddress[@]}"; 
 		do 
+			echo "Searching for: $searchdeviceaddress"
+
 			bluetoothscanresults="$bluetoothscanresults$(hcitool name "$searchdeviceaddress" 2>&1 | grep -v 'not available')"
 			bluetoothdevicepresent=$(echo "$bluetoothscanresults" | grep -icE "[a-z0-9]")
 			
