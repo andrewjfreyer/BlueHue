@@ -108,9 +108,7 @@ while ($1); do
 			#obtain individual address
 			searchdeviceaddress="${macaddress[$index]}"
 
-			#logging for debug
-			echo "Searching for: $searchdeviceaddress"
-
+			#obtain results and append each to the same
 			bluetoothscanresults="$bluetoothscanresults$(hcitool name "$searchdeviceaddress" 2>&1 | grep -v 'not available')"
 			bluetoothdevicepresent=$(echo "$bluetoothscanresults" | grep -icE "[a-z0-9]")
 			
