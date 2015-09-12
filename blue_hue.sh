@@ -75,25 +75,40 @@ function notify () {
 # PROGRAM LOOP
 # ----------------------------------------------------------------------------------------
 
+#make sure that we have the most recent IP address of the Hue Bridge
 refreshIPAddress
 
+#set default variables 
 defaultwait=0
-laststatus=$(curl -s $ip/api/$username/ | tr "{" "\n" | grep -ioc "\"on\":true")
 
+#count the lights that are turned on to get the current status
+lightstatus=$(curl -s $ip/api/$username/ | grep -Eo "\"lights\".*?\"groups\"")
+countoflightson=$(echo "$lightstatus" | grep -ioc "\"on\":true")
+countoflights=$(echo "$lightstatus" | grep -ioc "\"name\":")
 
-if [ "$laststatus" != "0" ]; then
-	notify "BlueHue Proximity (v. $Version) started with $laststatus light(s) on."
+#notify the current state along with 
+if [ "$countoflightson" != "0" ]; then
+	notify "BlueHue Proximity (v. $Version) started with $countoflightson of $countoflights light(s) on."
 else
-	notify "BlueHue Proximity (v. $Version) started with all lights off."
+	notify "BlueHue Proximity (v. $Version) started with all $countoflights light(s) off."
 fi
 
+#begin the operational loop
 while ($1); do	
+
+	#repeat for X times to verify that all bluetooth devices have left
 	for repetition in $(seq 1 $verifyrepetitions); 
 	do 
+		#cache bluetooth results 
 		bluetoothscanresults=""
 
-		for searchdeviceaddress in $"${macaddress[@]}"; 
-		do 
+		#searching from array-formatted credential file 
+		for index in "${!macaddress[@]}"
+		do
+			#obtain individual address
+			searchdeviceaddress="${macaddress[$index]}"
+
+			#logging for debug
 			echo "Searching for: $searchdeviceaddress"
 
 			bluetoothscanresults="$bluetoothscanresults$(hcitool name "$searchdeviceaddress" 2>&1 | grep -v 'not available')"
@@ -108,6 +123,7 @@ while ($1); do
  			fi
 		done
 
+		#none of the bluetooth devices are present
 		if [ "$bluetoothscanresults" == "" ]; then
 			if [ "$laststatus" != 0 ]; then  
 				if [ "$repetition" -eq $verifyrepetitions ] ; then 
