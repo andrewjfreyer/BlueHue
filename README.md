@@ -55,7 +55,7 @@ Turn [Philips Hue lights](http://www.meethue.com) on with a [Raspberry Pi](http:
 
 		Enable simple pairing: `hciconfig hci0 sspmode 0`
 
-Pair with bluetooth-pagent: `sudo bluetooth-agent 6666 00:61:71:BD:AC:92`
+		Pair with bluetooth-pagent: `sudo bluetooth-agent 6666 00:61:71:BD:AC:92`
 
 
 5. Add init.d
