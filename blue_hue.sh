@@ -21,7 +21,7 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=2.0
+Version=2.11
 source /home/pi/hue/support/hue_bashlibrary.sh
 source /home/pi/hue/support/credentials
 NOTIFICATIONSOURCE=/home/pi/hue/support/notification.sh ; [ -f $NOTIFICATIONSOURCE ] && source $NOTIFICATIONSOURCE
@@ -106,7 +106,7 @@ while ($1); do
 		for index in "${!macaddress[@]}"
 		do
 			#obtain individual address
-			searchdeviceaddress="$index = ${macaddress[$index]}"
+			searchdeviceaddress="${macaddress[$index]}"
 
 			#logging for debug
 			echo "Searching for: $searchdeviceaddress"
@@ -159,5 +159,7 @@ while ($1); do
 			echo "Unknown state."
 		fi
 	done
+
+	#next operation
 	sleep "$defaultwait"
 done
