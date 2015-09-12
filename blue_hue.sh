@@ -106,7 +106,7 @@ while ($1); do
 		for index in "${!macaddress[@]}"
 		do
 			#obtain individual address
-			searchdeviceaddress="${macaddress[$index]}"
+			searchdeviceaddress="$index = ${macaddress[$index]}"
 
 			#logging for debug
 			echo "Searching for: $searchdeviceaddress"
