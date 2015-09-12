@@ -39,7 +39,8 @@ Turn [Philips Hue lights](http://www.meethue.com) on with a [Raspberry Pi](http:
   
   `sudo apt-get install bluetooth bluez-utils blueman`
  
-3. Discover mac address of Portable Bluetooth Device (*Note:* skip to 3 if MAC is known)
+3. Discover MACADDR of Portable Bluetooth Device (device must be discoverable) 
+	*Note:* skip to 3 if MACADDR is known from device info
   
   `hcitool scan`
 
