@@ -84,7 +84,7 @@ defaultwait=0
 #count the lights that are turned on to get the current status
 lightstatus=$(curl -s $ip/api/$username/ | grep -Eo "\"lights\".*?\"groups\"")
 countoflightson=$(echo "$lightstatus" | grep -ioc "\"on\":true")
-countoflights=$(echo "$lightstatus" | grep -ioc "\"name\":")
+countoflights=$(echo "$lightstatus" | grep -io "\"name\":" | wc -l)
 
 #notify the current state along with 
 if [ "$countoflightson" != "0" ]; then
