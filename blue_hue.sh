@@ -86,11 +86,14 @@ lightstatus=$(curl -s $ip/api/$username/ | grep -Eo "\"lights\".*?\"groups\"")
 countoflightson=$(echo "$lightstatus" | grep -ioc "\"on\":true")
 countoflights=$(echo "$lightstatus" | grep -io "\"name\":" | wc -l)
 
+#number of clients
+numberofclients=${#macaddress[@]}
+
 #notify the current state along with 
 if [ "$countoflightson" != "0" ]; then
-	notify "BlueHue Proximity (v. $Version) started with $countoflightson of $countoflights light(s) on."
+	notify "BlueHue Proximity (v. $Version) started with $countoflightson of $countoflights light(s) on ($numberofclients clients)."
 else
-	notify "BlueHue Proximity (v. $Version) started with all $countoflights light(s) off."
+	notify "BlueHue Proximity (v. $Version) started with all $countoflights light(s) off ($numberofclients clients)."
 fi
 
 #begin the operational loop

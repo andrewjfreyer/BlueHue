@@ -54,9 +54,11 @@ Turn [Philips Hue lights](http://www.meethue.com) on with a [Raspberry Pi](http:
 
 	a. If you run into trouble with this (iOS 9 seems to be causing some trouble):
 
+    `sudo echo "$MACADDRESS $PINCODE" >> /var/lib/bluetooth/[$MACADDRESS-OF-BLUETOOTH-DONGLE]/pincodes`
+
 		`hciconfig hci0 sspmode 0`
 
-		`sudo bluetooth-agent PINNUM MACADDR`
+		`sudo bluetooth-agent $PINCODE $MACADDRESS`
 
 
 5. Add init.d
