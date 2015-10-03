@@ -21,7 +21,7 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=2.14
+Version=2.14.1
 source /home/pi/hue/support/hue_bashlibrary.sh
 source /home/pi/hue/support/credentials
 NOTIFICATIONSOURCE=/home/pi/hue/support/notification.sh ; [ -f $NOTIFICATIONSOURCE ] && source $NOTIFICATIONSOURCE
@@ -72,7 +72,7 @@ function notify () {
 }
 
 # ----------------------------------------------------------------------------------------
-# PROGRAM LOOP
+# Prepare for Main Loop
 # ----------------------------------------------------------------------------------------
 
 #make sure that we have the most recent IP address of the Hue Bridge
@@ -80,6 +80,11 @@ refreshIPAddress
 
 #set default variables 
 defaultwait=0
+
+# ----------------------------------------------------------------------------------------
+# Preliminary Notifications
+# ----------------------------------------------------------------------------------------
+
 
 #count the lights that are turned on to get the current status
 lightstatus=$(curl -s $ip/api/$username/ | grep -Eo "\"lights\".*?\"groups\"")
@@ -96,11 +101,50 @@ else
 	notify "BlueHue Proximity (v. $Version) started with all $countoflights light(s) off ($numberofclients clients)."
 fi
 
+# ----------------------------------------------------------------------------------------
+# ARGV processing 
+# ----------------------------------------------------------------------------------------
+
+
 #argv updates
 if [ ! -z "$1" ]; then 
+
+	while [[ $# > 1 ]]
+	do
+	key="$1"
+
+	case $key in
+	    -e|--extension)
+	    EXTENSION="$2"
+	    shift # past argument
+	    ;;
+	    -s|--searchpath)
+	    SEARCHPATH="$2"
+	    shift # past argument
+	    ;;
+	    -l|--lib)
+	    LIBPATH="$2"
+	    shift # past argument
+	    ;;
+	    --default)
+	    DEFAULT=YES
+	    ;;
+	    *)
+	            # unknown option
+	    ;;
+	esac
+	shift # past argument or value
+	done
+
+
 	echo "bluehue (v. $Version): no command line arguments accepted at this time."
 	exit 1
 fi 
+
+# ----------------------------------------------------------------------------------------
+# Set Main Program Loop
+# ----------------------------------------------------------------------------------------
+
 
 #begin the operational loop
 while ($1); do	
