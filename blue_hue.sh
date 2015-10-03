@@ -76,12 +76,27 @@ function notify () {
 # ----------------------------------------------------------------------------------------
 
 function help () {
-	echo "*******************************************"
-	echo "BlueHue v. $Version - Andrew J Freyer 2015"
-	echo "*******************************************"
-	echo "\n\n"
-	echo "blue_hue.sh [-v|--version] (show version)"
-	echo "blue_hue.sh [-h|--help] (show helpfile)"
+	clear 
+	
+	#quick fake of a man page
+	echo "NAME"
+	echo "	blue_hue - bluetooth proximity for Philips Hue"
+	echo "\n"
+	echo "SYNOPSIS"
+	echo "	blue_hue  [-v|--version] [-h|--help]"
+	echo "\n"
+	echo "DESCRIPTION"
+	echo "	Control Philips Hue lights via bluetooth proximity of multiple devices"
+	echo "\n"
+	echo "OPTIONS"
+	echo "	-v|--version 	print version information"
+	echo "\n"
+	echo "	-h|--help 	print this help file"
+	echo "FILES"
+	echo "	/support/credentials 	add Hue API and other information"
+	echo "\n"
+	echo "AUTHOR"
+	echo "	Andrew J. Freyer - 2015"
 	exit 1
 }
 
