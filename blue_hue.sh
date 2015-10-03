@@ -21,7 +21,7 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=2.11
+Version=2.13
 source /home/pi/hue/support/hue_bashlibrary.sh
 source /home/pi/hue/support/credentials
 NOTIFICATIONSOURCE=/home/pi/hue/support/notification.sh ; [ -f $NOTIFICATIONSOURCE ] && source $NOTIFICATIONSOURCE
@@ -95,6 +95,12 @@ if [ "$countoflightson" != "0" ]; then
 else
 	notify "BlueHue Proximity (v. $Version) started with all $countoflights light(s) off ($numberofclients clients)."
 fi
+
+#argv updates
+if [ ! -z "$1" ]; then 
+	echo "bluehue (v. $Version): no command line arguments accepted."
+	exit 1
+fi 
 
 #begin the operational loop
 while ($1); do	
