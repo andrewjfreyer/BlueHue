@@ -71,35 +71,6 @@ function notify () {
 	fi
 }
 
-# ----------------------------------------------------------------------------------------
-# Prepare for Main Loop
-# ----------------------------------------------------------------------------------------
-
-#make sure that we have the most recent IP address of the Hue Bridge
-refreshIPAddress
-
-#set default variables 
-defaultwait=0
-
-# ----------------------------------------------------------------------------------------
-# Preliminary Notifications
-# ----------------------------------------------------------------------------------------
-
-
-#count the lights that are turned on to get the current status
-lightstatus=$(curl -s $ip/api/$username/ | grep -Eo "\"lights\".*?\"groups\"")
-countoflightson=$(echo "$lightstatus" | grep -ioc "\"on\":true")
-countoflights=$(echo "$lightstatus" | grep -io "\"name\":" | wc -l)
-
-#Number of clients that are monitored
-numberofclients=$((${#macaddress[@]} + 1))
-
-#notify the current state along with 
-if [ "$countoflightson" != "0" ]; then
-	notify "BlueHue Proximity (v. $Version) started with $countoflightson of $countoflights light(s) on ($numberofclients clients)."
-else
-	notify "BlueHue Proximity (v. $Version) started with all $countoflights light(s) off ($numberofclients clients)."
-fi
 
 # ----------------------------------------------------------------------------------------
 # ARGV processing 
@@ -136,15 +107,44 @@ if [ ! -z "$1" ]; then
 	shift # past argument or value
 	done
 
+	echo FILE EXTENSION  = "${EXTENSION}"
 
 	echo "bluehue (v. $Version): no command line arguments accepted at this time."
 	exit 1
 fi 
 
 # ----------------------------------------------------------------------------------------
-# Set Main Program Loop
+# Prepare for Main Loop
 # ----------------------------------------------------------------------------------------
 
+#make sure that we have the most recent IP address of the Hue Bridge
+refreshIPAddress
+
+#set default variables 
+defaultwait=0
+
+# ----------------------------------------------------------------------------------------
+# Preliminary Notifications
+# ----------------------------------------------------------------------------------------
+
+#count the lights that are turned on to get the current status
+lightstatus=$(curl -s $ip/api/$username/ | grep -Eo "\"lights\".*?\"groups\"")
+countoflightson=$(echo "$lightstatus" | grep -ioc "\"on\":true")
+countoflights=$(echo "$lightstatus" | grep -io "\"name\":" | wc -l)
+
+#Number of clients that are monitored
+numberofclients=$((${#macaddress[@]} + 1))
+
+#notify the current state along with 
+if [ "$countoflightson" != "0" ]; then
+	notify "BlueHue Proximity (v. $Version) started with $countoflightson of $countoflights light(s) on ($numberofclients clients)."
+else
+	notify "BlueHue Proximity (v. $Version) started with all $countoflights light(s) off ($numberofclients clients)."
+fi
+
+# ----------------------------------------------------------------------------------------
+# Set Main Program Loop
+# ----------------------------------------------------------------------------------------
 
 #begin the operational loop
 while ($1); do	
