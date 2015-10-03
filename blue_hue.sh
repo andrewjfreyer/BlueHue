@@ -105,13 +105,14 @@ if [ ! -z "$1" ]; then
 	shift # past argument or value
 	done
 
-	echo HELP = "${HELP}"
+	echo HELP = "$HELP"
 
 	#Process the commands
 
-	if [ ! -z "${HELP}" ]; then 
+	if [ ! -z "$HELP" ]; then 
 		echo "bluehue (v. $Version) help!"
-	elif [ ! -z "${VERSION_REQUEST}" ]; then 
+
+	elif [ ! -z "$VERSION_REQUEST" ]; then 
 		echo "bluehue (v. $Version)"
 	fi
 
