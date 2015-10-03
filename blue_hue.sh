@@ -76,10 +76,13 @@ function notify () {
 # ----------------------------------------------------------------------------------------
 
 function help () {
-	if [ ! -z "$1" ]; then 
-		echo "Help file here!"
-		exit 1
-	fi
+	echo "*******************************************"
+	echo "BlueHue v. $Version - Andrew J Freyer 2015"
+	echo "*******************************************"
+	echo "\n\n"
+	echo "blue_hue.sh [-v|--version] (show version)"
+	echo "blue_hue.sh [-h|--help] (show helpfile)"
+	exit 1
 }
 
 
