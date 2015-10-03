@@ -21,7 +21,7 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=2.13
+Version=2.14
 source /home/pi/hue/support/hue_bashlibrary.sh
 source /home/pi/hue/support/credentials
 NOTIFICATIONSOURCE=/home/pi/hue/support/notification.sh ; [ -f $NOTIFICATIONSOURCE ] && source $NOTIFICATIONSOURCE
@@ -86,8 +86,8 @@ lightstatus=$(curl -s $ip/api/$username/ | grep -Eo "\"lights\".*?\"groups\"")
 countoflightson=$(echo "$lightstatus" | grep -ioc "\"on\":true")
 countoflights=$(echo "$lightstatus" | grep -io "\"name\":" | wc -l)
 
-#number of clients
-numberofclients=${#macaddress[@]}
+#Number of clients that are monitored
+numberofclients=$((${#macaddress[@]} + 1))
 
 #notify the current state along with 
 if [ "$countoflightson" != "0" ]; then
@@ -98,7 +98,7 @@ fi
 
 #argv updates
 if [ ! -z "$1" ]; then 
-	echo "bluehue (v. $Version): no command line arguments accepted."
+	echo "bluehue (v. $Version): no command line arguments accepted at this time."
 	exit 1
 fi 
 
