@@ -91,40 +91,15 @@ function help () {
 #argv updates
 if [ ! -z "$1" ]; then 
 
-	while [[ $# > 1 ]]
-	do
-	key="$1"
-
-	case $key in
-	    -h|--help)
-	    help
-	    ;;
-	    -v|--version)
-	    VERSION_REQUEST="1"
-	    ;;
-	    -f|--find)
-	    MACTOFIND="$2"
-	    shift # past argument
-	    ;;
-	    --default)
-	    DEFAULT=YES
-	    ;;
-	    *)
-	            # unknown option
-	    ;;
+	#very rudamentary process here, only limited support for input functions
+	case "$1" in
+		-v|--version )
+			echo "$Version"
+		;;
+		-h|--help )
+			help
+		;;
 	esac
-	done
-
-	echo HELP = "$HELP"
-
-	#Process the commands
-
-	if [ ! -z "$HELP" ]; then 
-		echo "bluehue (v. $Version) help!"
-
-	elif [ ! -z "$VERSION_REQUEST" ]; then 
-		echo "bluehue (v. $Version)"
-	fi
 
 	exit 1
 fi 
