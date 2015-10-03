@@ -21,7 +21,7 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=2.14.4
+Version=2.14.5
 source /home/pi/hue/support/hue_bashlibrary.sh
 source /home/pi/hue/support/credentials
 NOTIFICATIONSOURCE=/home/pi/hue/support/notification.sh ; [ -f $NOTIFICATIONSOURCE ] && source $NOTIFICATIONSOURCE
@@ -162,7 +162,7 @@ fi
 # ----------------------------------------------------------------------------------------
 
 #begin the operational loop
-while ($1); do	
+while (true); do	
 
 	#repeat for X times to verify that all bluetooth devices have left
 	for repetition in $(seq 1 $verifyrepetitions); 
