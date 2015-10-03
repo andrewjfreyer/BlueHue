@@ -21,7 +21,7 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=2.14.2
+Version=2.14.3
 source /home/pi/hue/support/hue_bashlibrary.sh
 source /home/pi/hue/support/credentials
 NOTIFICATIONSOURCE=/home/pi/hue/support/notification.sh ; [ -f $NOTIFICATIONSOURCE ] && source $NOTIFICATIONSOURCE
@@ -81,6 +81,7 @@ function help () {
 	#quick fake of a man page
 	echo "NAME"
 	echo "	blue_hue - bluetooth proximity for Philips Hue"
+	echo "	v. $Version"
 	echo "\n"
 	echo "SYNOPSIS"
 	echo "	blue_hue  [-v|--version] [-h|--help]"
