@@ -21,7 +21,7 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=2.14.3
+Version=2.14.4
 source /home/pi/hue/support/hue_bashlibrary.sh
 source /home/pi/hue/support/credentials
 NOTIFICATIONSOURCE=/home/pi/hue/support/notification.sh ; [ -f $NOTIFICATIONSOURCE ] && source $NOTIFICATIONSOURCE
