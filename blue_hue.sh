@@ -77,7 +77,7 @@ function notify () {
 
 function help () {
 	clear 
-	
+
 	#quick fake of a man page
 	echo "NAME"
 	echo "	blue_hue - bluetooth proximity for Philips Hue"
@@ -90,13 +90,15 @@ function help () {
 	echo "\n"
 	echo "OPTIONS"
 	echo "	-v|--version 	print version information"
-	echo "\n"
 	echo "	-h|--help 	print this help file"
+	echo "\n"
 	echo "FILES"
 	echo "	/support/credentials 	add Hue API and other information"
 	echo "\n"
 	echo "AUTHOR"
-	echo "	Andrew J. Freyer - 2015"
+	echo "	Andrew J. Freyer - 2015 (https://github.com/andrewjfreyer/)"
+	echo "\n"
+
 	exit 1
 }
 
