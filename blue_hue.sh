@@ -85,16 +85,14 @@ if [ ! -z "$1" ]; then
 	key="$1"
 
 	case $key in
-	    -e|--extension)
-	    EXTENSION="$2"
-	    shift # past argument
+	    -h|--help)
+	    HELP="1"
 	    ;;
-	    -s|--searchpath)
-	    SEARCHPATH="$2"
-	    shift # past argument
+	    -v|--version)
+	    VERSION_REQUEST="1"
 	    ;;
-	    -l|--lib)
-	    LIBPATH="$2"
+	    -f|--find)
+	    MACTOFIND="$2"
 	    shift # past argument
 	    ;;
 	    --default)
@@ -107,9 +105,16 @@ if [ ! -z "$1" ]; then
 	shift # past argument or value
 	done
 
-	echo FILE EXTENSION  = "${EXTENSION}"
+	echo HELP = "${HELP}"
 
-	echo "bluehue (v. $Version): no command line arguments accepted at this time."
+	#Process the commands
+
+	if [ ! -z "${HELP}" ]; then 
+		echo "bluehue (v. $Version) help!"
+	elif [ ! -z "${VERSION_REQUEST}" ]; then 
+		echo "bluehue (v. $Version)"
+	fi
+
 	exit 1
 fi 
 
