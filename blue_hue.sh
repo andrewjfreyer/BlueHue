@@ -15,13 +15,13 @@
 
 # ----------------------------------------------------------------------------------------
 # Simple pair: 			sudo l2ping MAC (with device discoverable)
-# Enable simple pair: 	sudo hciconfig hci0 sspmode 0
+# Enable simple pair: 	sudo hciconfig hci0 sspmode 0 ; set pairing code; pair
 # ----------------------------------------------------------------------------------------
 
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=2.14.5
+Version=2.14.6
 source /home/pi/hue/support/hue_bashlibrary.sh
 source /home/pi/hue/support/credentials
 NOTIFICATIONSOURCE=/home/pi/hue/support/notification.sh ; [ -f $NOTIFICATIONSOURCE ] && source $NOTIFICATIONSOURCE
@@ -30,10 +30,11 @@ NOTIFICATIONSOURCE=/home/pi/hue/support/notification.sh ; [ -f $NOTIFICATIONSOUR
 # Set Program Variables
 # ----------------------------------------------------------------------------------------
 
+awayIterationMax=5 				#interations of 'away' mode after which light status is checked
 delaywhilepresent=80 			#higher means slower turn off when leaving
 delaywhileabsent=6 				#higher means slower recognition when turning on 
 delaywhileverify=3 				#higher means slower verification of absence times
-defaultdelaybeforeon=0		#higher means slower turn on
+defaultdelaybeforeon=0			#higher means slower turn on
 delaybetweenscan=3				#advised for bluetooth hardware 
 verifyrepetitions=3 			#lower means more false rejection 
 ip=0.0.0.0 						#IP address filler
@@ -59,6 +60,20 @@ function refreshIPAddress () {
 		ip=$(curl -s -L http://www.meethue.com/api/nupnp | grep -ioE "[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}")
 		echo "$ip" > /home/pi/hue/support/hue_ip
 	fi
+}
+
+# ----------------------------------------------------------------------------------------
+# GET THE COUNT(S) OF LIGHTS ON
+# ----------------------------------------------------------------------------------------
+
+function lightStatus () {
+	#count the lights that are turned on to get the current status
+	lightstatus=$(curl -s $ip/api/$username/ | grep -Eo "\"lights\".*?\"groups\"")
+	countoflightson=$(echo "$lightstatus" | grep -ioc "\"on\":true")
+	countoflights=$(echo "$lightstatus" | grep -io "\"name\":" | wc -l)
+
+	#formatted as sentence; not parsed
+	echo "$countoflights light(s) ON and $((countoflights - countoflightson)) lights OFF"
 }
 
 # ----------------------------------------------------------------------------------------
@@ -108,21 +123,17 @@ function help () {
 # ARGV processing 
 # ----------------------------------------------------------------------------------------
 
-
 #argv updates
 if [ ! -z "$1" ]; then 
-
 	#very rudamentary process here, only limited support for input functions
 	case "$1" in
 		-v|--version )
 			echo "$Version"
 			exit 1
-
 		;;
 		-h|--help )
 			help
 			exit 1
-
 		;;
 	esac
 
@@ -135,31 +146,34 @@ fi
 #make sure that we have the most recent IP address of the Hue Bridge
 refreshIPAddress
 
-#set default variables 
+#set default variables; this variable is reset during the operation loop; just a placeholder
 defaultwait=0
 
 # ----------------------------------------------------------------------------------------
 # Preliminary Notifications
 # ----------------------------------------------------------------------------------------
 
-#count the lights that are turned on to get the current status
-lightstatus=$(curl -s $ip/api/$username/ | grep -Eo "\"lights\".*?\"groups\"")
-countoflightson=$(echo "$lightstatus" | grep -ioc "\"on\":true")
-countoflights=$(echo "$lightstatus" | grep -io "\"name\":" | wc -l)
+statusOfLights=$(lightStatus)
 
 #Number of clients that are monitored
 numberofclients=$((${#macaddress[@]} + 1))
 
 #notify the current state along with 
 if [ "$countoflightson" != "0" ]; then
-	notify "BlueHue Proximity (v. $Version) started with $countoflightson of $countoflights light(s) on ($numberofclients clients)."
+	notify "BlueHue Proximity (v. $Version) started; $statusOfLights on ($numberofclients clients)."
 else
-	notify "BlueHue Proximity (v. $Version) started with all $countoflights light(s) off ($numberofclients clients)."
+	notify "BlueHue Proximity (v. $Version) started with all light(s) off ($numberofclients clients)."
 fi
 
 # ----------------------------------------------------------------------------------------
 # Set Main Program Loop
 # ----------------------------------------------------------------------------------------
+
+#prepare necessary variables
+currentLightStatusString="$statusOfLights"
+
+#status check iterator
+statusCheckIterator=0
 
 #begin the operational loop
 while (true); do	
@@ -202,6 +216,28 @@ while (true); do
 					break
 				fi
 			else
+
+				#inject an option to search for lights changes
+				if [ "$statusCheckIterator" -gt $awayIterationMax ] ; then 
+					#get new light status
+					newlightstatusstrings=$(lightStatus)
+
+					if [ "$currentLightStatusString" != "$newlightstatusstrings" ]; then 
+						#reset the variable holder
+						currentLightStatusString="$newlightstatusstrings"
+
+						#notify
+						notify "Light status changed to: $currentLightStatusString"
+					fi
+
+					#reset the counter
+					statusCheckIterator=0
+				
+				else
+					#iterate the counter
+					statusCheckIterator=$((statusCheckIterator+1))
+				fi
+
 				#bluetooth device remains absent
 				defaultwait=$delaywhileabsent
 				break
@@ -216,6 +252,10 @@ while (true); do
 				sleep $defaultdelaybeforeon 
 				hue_allon_custom
 				laststatus=1
+
+				#reset to 0
+				statusCheckIterator=0
+
 			else
 				#bluetooth device remains present.
 				defaultwait=$delaywhilepresent
