@@ -21,7 +21,7 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=2.14.7
+Version=2.14.8
 source /home/pi/hue/support/hue_bashlibrary.sh
 source /home/pi/hue/support/credentials
 NOTIFICATIONSOURCE=/home/pi/hue/support/notification.sh ; [ -f $NOTIFICATIONSOURCE ] && source $NOTIFICATIONSOURCE
@@ -217,12 +217,13 @@ while (true); do
 				fi
 			else
 
+				echo "DEBUG: testing: $statusCheckIterator && $newlightstatusstrings"
+
 				#inject an option to search for lights changes
 				if [ "$statusCheckIterator" -gt $awayIterationMax ] ; then 
 					#get new light status
 					newlightstatusstrings=$(lightStatus)
 
-					echo "DEBUG: testing: $newlightstatusstrings"
 
 					if [ "$currentLightStatusString" != "$newlightstatusstrings" ]; then 
 						#reset the variable holder
