@@ -21,7 +21,7 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=2.14.11
+Version=2.14.13
 source /home/pi/hue/support/hue_bashlibrary.sh
 source /home/pi/hue/support/credentials
 NOTIFICATIONSOURCE=/home/pi/hue/support/notification.sh ; [ -f $NOTIFICATIONSOURCE ] && source $NOTIFICATIONSOURCE
@@ -30,7 +30,7 @@ NOTIFICATIONSOURCE=/home/pi/hue/support/notification.sh ; [ -f $NOTIFICATIONSOUR
 # Set Program Variables
 # ----------------------------------------------------------------------------------------
 
-awayIterationMax=5 				#interations of 'away' mode after which light status is checked
+awayIterationMax=3 				#interations of 'away' mode after which light status is checked
 delaywhilepresent=80 			#higher means slower turn off when leaving
 delaywhileabsent=6 				#higher means slower recognition when turning on 
 delaywhileverify=3 				#higher means slower verification of absence times
@@ -68,19 +68,22 @@ function refreshIPAddress () {
 
 function lightStatus () {
 	#count the lights that are turned on to get the current status
-	lightstatus=$(curl -s $ip/api/$username/ | grep -Eo "\"lights\".*?\"groups\"" | sed 's/"name"/\n"name"/g')
+	alllightstatus=$(curl -s $ip/api/$username/ | grep -Eo "\"lights\".*?\"groups\"" | sed 's/"name"/\n"name"/g')
 
 	#find only reachable lights
-	reachableLights=$(echo "$lightstatus" | grep -ioc "\"reachable\":true")
+	reachableLights=$(echo "$alllightstatus" | grep -io "\"reachable\":true")
 	
+	#reachable light count
+	reachableLightsCount=$(echo "$reachableLights" | wc -l)
+
 	#now, of the reachable lights:
 	countoflightson=$(echo "$reachableLights" | grep -ioc "\"on\":true")
 
 	#total lights
-	countoflights=$(echo "$lightstatus" | grep -io "\"name\":" | wc -l)
+	countoflights=$(echo "$alllightstatus" | grep -io "\"name\":" | wc -l)
 
 	#formatted as sentence; not parsed
-	echo "$countoflightson light(s) ON, $((reachableLights - countoflightson)) light(s) OFF, $((countoflights - reachableLights)) light(s) UNR."
+	echo "$countoflightson light(s) ON, $((reachableLightsCount - countoflightson)) light(s) OFF, $((countoflights - reachableLightsCount)) light(s) UNR."
 }
 
 # ----------------------------------------------------------------------------------------
