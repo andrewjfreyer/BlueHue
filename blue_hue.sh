@@ -21,7 +21,7 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=2.14.10
+Version=2.14.11
 source /home/pi/hue/support/hue_bashlibrary.sh
 source /home/pi/hue/support/credentials
 NOTIFICATIONSOURCE=/home/pi/hue/support/notification.sh ; [ -f $NOTIFICATIONSOURCE ] && source $NOTIFICATIONSOURCE
@@ -80,7 +80,7 @@ function lightStatus () {
 	countoflights=$(echo "$lightstatus" | grep -io "\"name\":" | wc -l)
 
 	#formatted as sentence; not parsed
-	echo "$countoflightson light(s) ON, $((reachableLights - countoflightson)) light(s) OFF, $((countoflights - reachableLights)) ERR."
+	echo "$countoflightson light(s) ON, $((reachableLights - countoflightson)) light(s) OFF, $((countoflights - reachableLights)) light(s) UNR."
 }
 
 # ----------------------------------------------------------------------------------------
@@ -228,9 +228,12 @@ while (true); do
 
 				#inject an option to search for lights changes
 				if [ "$statusCheckIterator" -gt $awayIterationMax ] ; then 
+
+
 					#get new light status
 					newlightstatusstrings=$(lightStatus)
 
+					echo "DEBUG: NEW: $statusCheckIterator && $currentLightStatusString [$newlightstatusstrings]"
 
 					if [ "$currentLightStatusString" != "$newlightstatusstrings" ]; then 
 						#reset the variable holder
