@@ -14,14 +14,9 @@
 # ----------------------------------------------------------------------------------------
 
 # ----------------------------------------------------------------------------------------
-# Simple pair: 			sudo l2ping MAC (with device discoverable)
-# Enable simple pair: 	sudo hciconfig hci0 sspmode 0 ; set pairing code; pair
-# ----------------------------------------------------------------------------------------
-
-# ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=2.14.13
+Version=2.14.14
 source /home/pi/hue/support/hue_bashlibrary.sh
 source /home/pi/hue/support/credentials
 NOTIFICATIONSOURCE=/home/pi/hue/support/notification.sh ; [ -f $NOTIFICATIONSOURCE ] && source $NOTIFICATIONSOURCE
@@ -71,7 +66,7 @@ function lightStatus () {
 	alllightstatus=$(curl -s $ip/api/$username/ | grep -Eo "\"lights\".*?\"groups\"" | sed 's/"name"/\n"name"/g')
 
 	#find only reachable lights
-	reachableLights=$(echo "$alllightstatus" | grep -io "\"reachable\":true")
+	reachableLights=$(echo "$alllightstatus" | grep "\"reachable\":true")
 	
 	#reachable light count
 	reachableLightsCount=$(echo "$reachableLights" | wc -l)
