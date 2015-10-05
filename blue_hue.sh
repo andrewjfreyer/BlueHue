@@ -21,7 +21,7 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=2.14.8
+Version=2.14.9
 source /home/pi/hue/support/hue_bashlibrary.sh
 source /home/pi/hue/support/credentials
 NOTIFICATIONSOURCE=/home/pi/hue/support/notification.sh ; [ -f $NOTIFICATIONSOURCE ] && source $NOTIFICATIONSOURCE
@@ -68,12 +68,19 @@ function refreshIPAddress () {
 
 function lightStatus () {
 	#count the lights that are turned on to get the current status
-	lightstatus=$(curl -s $ip/api/$username/ | grep -Eo "\"lights\".*?\"groups\"")
-	countoflightson=$(echo "$lightstatus" | grep -ioc "\"on\":true")
+	lightstatus=$(curl -s $ip/api/$username/ | grep -Eo "\"lights\".*?\"groups\"" | sed 's/"name"/\n"name"/g' )
+
+	#find only reachable lights
+	reachableLights=$(echo "$lightstatus" | grep -ioc "\"reachable\":true")
+	
+	#now, of the reachable lights:
+	countoflightson=$(echo "$reachableLights" | grep -ioc "\"on\":true")
+
+	#total lights
 	countoflights=$(echo "$lightstatus" | grep -io "\"name\":" | wc -l)
 
 	#formatted as sentence; not parsed
-	echo "$countoflightson light(s) ON and $((countoflights - countoflightson)) light(s) OFF"
+	echo "$countoflightson light(s) ON, $((reachableLights - countoflightson)) light(s) OFF, $((lightstatus - reachableLights)) UKN."
 }
 
 # ----------------------------------------------------------------------------------------
@@ -217,7 +224,7 @@ while (true); do
 				fi
 			else
 
-				echo "DEBUG: testing: $statusCheckIterator && $newlightstatusstrings"
+				echo "DEBUG: testing: $statusCheckIterator && $currentLightStatusString"
 
 				#inject an option to search for lights changes
 				if [ "$statusCheckIterator" -gt $awayIterationMax ] ; then 
