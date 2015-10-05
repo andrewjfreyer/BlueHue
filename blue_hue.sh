@@ -21,7 +21,7 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=2.14.9
+Version=2.14.10
 source /home/pi/hue/support/hue_bashlibrary.sh
 source /home/pi/hue/support/credentials
 NOTIFICATIONSOURCE=/home/pi/hue/support/notification.sh ; [ -f $NOTIFICATIONSOURCE ] && source $NOTIFICATIONSOURCE
@@ -68,7 +68,7 @@ function refreshIPAddress () {
 
 function lightStatus () {
 	#count the lights that are turned on to get the current status
-	lightstatus=$(curl -s $ip/api/$username/ | grep -Eo "\"lights\".*?\"groups\"" | sed 's/"name"/\n"name"/g' )
+	lightstatus=$(curl -s $ip/api/$username/ | grep -Eo "\"lights\".*?\"groups\"" | sed 's/"name"/\n"name"/g')
 
 	#find only reachable lights
 	reachableLights=$(echo "$lightstatus" | grep -ioc "\"reachable\":true")
@@ -80,7 +80,7 @@ function lightStatus () {
 	countoflights=$(echo "$lightstatus" | grep -io "\"name\":" | wc -l)
 
 	#formatted as sentence; not parsed
-	echo "$countoflightson light(s) ON, $((reachableLights - countoflightson)) light(s) OFF, $((lightstatus - reachableLights)) UKN."
+	echo "$countoflightson light(s) ON, $((reachableLights - countoflightson)) light(s) OFF, $((countoflights - reachableLights)) ERR."
 }
 
 # ----------------------------------------------------------------------------------------
