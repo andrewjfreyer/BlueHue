@@ -38,17 +38,11 @@ Turn [Philips Hue lights](http://www.meethue.com) on with a [Raspberry Pi](http:
 2. Install Bluetooth/Bluez
   
   `sudo apt-get install bluetooth bluez-utils blueman`
- 
-3. Discover MACADDR of Portable Bluetooth Device (device must be discoverable) 
-	*Note:* skip to 3 if MACADDR is known from device info
-  
-  `hcitool scan`
 
-4. Run pair.sh for each device to pair (still have to add these devices to credentials file)
 
-	`sh pair.sh`
+3. Trigger a "pairing" event. (UNDER DEVELOPMENT)
 
-5. Add init.d
+3. Add init.d
 
   `if [ "$1" == "start" ]; then bash /home/pi/hue/blue_hue.sh true & ;  fi`
 
@@ -56,10 +50,10 @@ Turn [Philips Hue lights](http://www.meethue.com) on with a [Raspberry Pi](http:
   
   `sudo update-rc.d bluehue defaults`
   
-6. Add information to Credentials file
+4. Add information to credentials and/or configuration file(s)
 
 
-7. Reboot or Launch
+5. Reboot or Launch
 
   `sudo /etc/init.d/bluehue`
 
