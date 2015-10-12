@@ -7,11 +7,7 @@
 # Written by Andrew J Freyer
 
 #Load the credential pages again
-credentials=$(cat /home/pi/hue/support/notification_credentials)
-
-#Download the credentials 
-PushoverToken=$(echo "$credentials" | awk '{print $2}')
-PushoverUserKey=$(echo "$credentials" | awk '{print $1}')
+source /home/pi/hue/support/notification_credentials
 
 function notifyViaPushover () {
 	if [ ! -z $PushoverUserKey ] && [ ! -z $PushoverToken ];then 

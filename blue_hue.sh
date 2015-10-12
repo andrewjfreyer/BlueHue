@@ -16,10 +16,18 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=2.14.15
-source /home/pi/hue/support/hue_bashlibrary.sh
-source /home/pi/hue/support/credentials
-NOTIFICATIONSOURCE=/home/pi/hue/support/notification.sh ; [ -f $NOTIFICATIONSOURCE ] && source $NOTIFICATIONSOURCE
+Version=3.1.0
+
+#find the support directory
+support_directory="/home/pi/hue/support"
+main_directory="/home/pi/hue"
+
+#source the support files
+source "$support_directory/hue_bashlibrary.sh"
+source "$support_directory/credentials_api"
+
+#if and only if we have a notification system enabled
+NOTIFICATIONSOURCE="$support_directory/notification.sh" ; [ -f $NOTIFICATIONSOURCE ] && source $NOTIFICATIONSOURCE
 
 # ----------------------------------------------------------------------------------------
 # Set Program Variables
@@ -34,31 +42,152 @@ delaybetweenscan=3				#advised for bluetooth hardware
 verifyrepetitions=3 			#lower means more false rejection 
 ip=0.0.0.0 						#IP address filler
 
+#fill mac address array
+IFS=$'\n' read -d '' -r -a macaddress < "$support_directory/credentials_user"
+
+#load the defaults, if the user wants to specify their own 
+CONFIGSOURCE=$main_directory/configuration ; [ -f $CONFIGSOURCE ] && source $CONFIGSOURCE
+
 # ----------------------------------------------------------------------------------------
 # Credential Information Verification
 # ----------------------------------------------------------------------------------------
 
-if [ -z $devicetype ] ||  [ -z $username ] || [ -z "$macaddress" ]; then 
-	echo "error: please supply credentials"
+if [ -z "$devicetype" ] ||  [ -z "$username" ] || [ -z "$macaddress" ]; then 
+	echo "error: please supply credentials; at least one credential is missing"
 	exit 127
-fi 
+fi
+
+# ----------------------------------------------------------------------------------------
+# PAIR A NEW USER
+# ----------------------------------------------------------------------------------------
+
+function addNewUserToBluetooth () {
+	#if there are $1 arguments, then use that as the search string 
+
+	#need to check if sudo
+	if [ "$(whoami)" != "root" ]; then 
+		echo "Error: need to run as root."
+		exit 1
+	fi 
+
+	#get the addresss
+	bluetooth_dongle_address=$(hciconfig info | grep -Eo "[0-9A-F:]{17}")
+
+	#is this dongle installed?
+	if [ -d "/var/lib/bluetooth/$bluetooth_dongle_address" ]; then 
+		echo "hci0 is $bluetooth_dongle_address"
+	else
+		echo "Error: No bluetooth dongle found."
+		exit 1
+	fi 
+
+	#scan keyword
+	keyword="iphone"
+
+	if [ "$1" != "" ]; then 
+		echo "Using keyword: $response"
+		keyword="$1"
+	else
+		echo "Using keyword: iphone"
+	fi 
+
+	#scanning for the bluetooth device 
+	scanresults=$(hcitool scan)
+
+	#scan for name
+	macaddress_new=$(echo "$scanresults" | grep -i "$keyword" | grep -Eo "[0-9A-F:]{17}")
+
+	#if nothing found; exit
+	if [ -z "$macaddress_new" ]; then 
+		return 0
+	fi
+
+	#need to verify that we are not already connected
+	list_of_devices=$(sudo bluez-test-device list)
+
+	if [ $(echo "$list_of_devices" | grep -ioc "$macaddress_new" ) -gt 0 ]; then 
+		#device is already paired; get the pre-existing pin number
+		PINCODE=$(cat "/var/lib/bluetooth/$bluetooth_dongle_address/pincodes" | grep "$macaddress_new" | awk '{print $2}')
+		echo " --> Disconnecting and forgetting $macaddress_new"
+		errors=$(sudo bluez-test-device disconnect "$macaddress_new" 2>&1 1>/dev/null)
+		errors=$(sudo bluez-test-device remove "$macaddress_new" 2>&1 1>/dev/null)
+
+				#remove the device here
+		echo " --> Removeing PIN $PINCODE from database."
+
+		#clear from pincodes database
+		cat "/var/lib/bluetooth/$bluetooth_dongle_address/pincodes" | grep -v "$macaddress_new" > "/var/lib/bluetooth/$bluetooth_dongle_address/pincodes"
+
+		#clear from internal database
+		cat "$support_directory/credentials_user" | grep -v "$macaddress_new" > "$support_directory/credentials_user"
+
+	fi 
+
+	#does the pin file exist?
+	if [ ! -f "/var/lib/bluetooth/$bluetooth_dongle_address/pincodes" ]; then 
+		#create the file if needed
+		echo "Creating new pincodes file."
+		echo "#created by BlueHue - Andrew J Freyer" >> "/var/lib/bluetooth/$bluetooth_dongle_address/pincodes"
+	fi 
+
+	#get a random four-digit pin number
+	PIN=$(shuf -i 1000-9999 -n 1)
+
+	#get the pin number set `
+	hciconfig hci0 name "BlueHueProximity-$PIN"
+
+	#does the path exist?
+	if [ -d "/var/lib/bluetooth/$bluetooth_dongle_address" ]; then 
+		#should test here for a big problem 
+		echo "$macaddress_new $PIN" >> "/var/lib/bluetooth/$bluetooth_dongle_address/pincodes"
+
+		#add to database
+		echo "$macaddress_new" >> "$support_directory/credentials_user"
+	fi 
+
+	#if we are here, then we can finally pair!
+	hciconfig hci0 sspmode 0
+
+	#pair
+	bluetooth-agent "$PIN" "$macaddress_new"
+
+	#list the avilable devices
+	sudo bluez-test-device list
+
+	#verify 
+	new_username=$(hcitool name "$macaddress_new")
+
+	#try to get the name
+	if [ ! -z  $"new_username" ]; then 
+		echo "Success!"
+		#verify that we have found a new device
+		notify "Note: $new_username at $macaddress_new."
+	else
+		notify "Note: failed to add $macaddress_new."
+	fi 
+
+	return 0
+}
 
 # ----------------------------------------------------------------------------------------
 # GET THE IP OF THE BRIDGE
 # ----------------------------------------------------------------------------------------
 
 function refreshIPAddress () {
-	ip=$(cat /home/pi/hue/support/hue_ip)
+	ip=$(cat "$support_directory/hue_ip")
 	verifybridge=$(curl -m 1 -s "$ip/api" | grep -c "not available for resource")
 
+	#if we don't have an IP address from the cache or the bridge isn't responding, then 
+	#we grab the IP address from the UPnP json sent from the bridge with remote access
+	#enabled. 
 	if [ -z "$ipaddress" ] || [ "$verifybridge" != "1" ]; then 
 		ip=$(curl -s -L http://www.meethue.com/api/nupnp | grep -ioE "[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}")
-		echo "$ip" > /home/pi/hue/support/hue_ip
+		echo "$ip" > "$support_directory/hue_ip"
 	fi
 }
 
 # ----------------------------------------------------------------------------------------
-# GET THE COUNT(S) OF LIGHTS ON
+# GET THE STATUS STRING OF THE LIGHTS
 # ----------------------------------------------------------------------------------------
 
 function lightStatus () {
@@ -158,27 +287,24 @@ defaultwait=0
 # Preliminary Notifications
 # ----------------------------------------------------------------------------------------
 
-statusOfLights=$(lightStatus)
+statusOfLightsString=$(lightStatus)
 
 #Number of clients that are monitored
-numberofclients=$((${#macaddress[@]} + 1))
+numberofclients=$((${#macaddress[@]}))
 
 #notify the current state along with 
-if [ "$countoflightson" != "0" ]; then
-	notify "BlueHue Proximity (v. $Version) started; $statusOfLights on ($numberofclients clients)."
-else
-	notify "BlueHue Proximity (v. $Version) started with all light(s) off ($numberofclients clients)."
-fi
+notify "BlueHue Proximity (v. $Version) started by user $(whoami); $statusOfLightsString ($numberofclients users)."
+
+
+#prepare necessary variables
+currentLightStatusString="$statusOfLightsString"
+
+#status check iterator
+statusCheckIterator=0
 
 # ----------------------------------------------------------------------------------------
 # Set Main Program Loop
 # ----------------------------------------------------------------------------------------
-
-#prepare necessary variables
-currentLightStatusString="$statusOfLights"
-
-#status check iterator
-statusCheckIterator=0
 
 #begin the operational loop
 while (true); do	
