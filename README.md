@@ -44,22 +44,9 @@ Turn [Philips Hue lights](http://www.meethue.com) on with a [Raspberry Pi](http:
   
   `hcitool scan`
 
-3. Change the Bluetooth name (optional)
+4. Run pair.sh for each device to pair (still have to add these devices to credentials file)
 
-  `sudo hciconfig hci0 name 'BlueHueProx'`
-
-4. Connect the Portable Bluetooth Device:
-
-    `sudo l2ping MACADDRESS`
-
-	a. If you run into trouble with this (iOS 9 seems to be causing some trouble):
-
-    `sudo echo "$MACADDRESS $PINCODE" >> /var/lib/bluetooth/[$MACADDRESS-OF-BLUETOOTH-DONGLE]/pincodes`
-
-		`hciconfig hci0 sspmode 0`
-
-		`sudo bluetooth-agent $PINCODE $MACADDRESS`
-
+	`sh pair.sh`
 
 5. Add init.d
 
