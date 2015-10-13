@@ -16,7 +16,7 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=3.1.0
+Version=3.1.1
 
 #find the support directory
 support_directory="/home/pi/hue/support"
@@ -41,6 +41,7 @@ defaultdelaybeforeon=0			#higher means slower turn on
 delaybetweenscan=3				#advised for bluetooth hardware 
 verifyrepetitions=3 			#lower means more false rejection 
 ip=0.0.0.0 						#IP address filler
+
 
 #fill mac address array
 IFS=$'\n' read -d '' -r -a macaddress < "$support_directory/credentials_user"
@@ -99,6 +100,7 @@ function addNewUserToBluetooth () {
 
 	#if nothing found; exit
 	if [ -z "$macaddress_new" ]; then 
+		notify "Note: No new bluetooth devices matching '$keyword' were found."
 		return 0
 	fi
 
@@ -168,6 +170,7 @@ function addNewUserToBluetooth () {
 
 	return 0
 }
+
 
 # ----------------------------------------------------------------------------------------
 # GET THE IP OF THE BRIDGE
@@ -241,8 +244,8 @@ function help () {
 	echo "OPTIONS"
 	echo "	-v|--version 	print version information"
 	echo "	-h|--help 	print this help file"
+	echo "	-p|--pair 	pair with new device"
 	echo "\n"
-	echo "FILES"
 	echo "	/support/credentials 	add Hue API and other information"
 	echo "\n"
 	echo "AUTHOR"
@@ -267,6 +270,10 @@ if [ ! -z "$1" ]; then
 		;;
 		-h|--help )
 			help
+			exit 1
+		;;
+		-p|--pair )
+			addNewUserToBluetooth $2
 			exit 1
 		;;
 	esac
