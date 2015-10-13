@@ -27,7 +27,7 @@ source "$support_directory/hue_bashlibrary.sh"
 source "$support_directory/credentials_api"
 
 #if and only if we have a notification system enabled
-NOTIFICATIONSOURCE="$support_directory/notification.sh" ; [ -f $NOTIFICATIONSOURCE ] && source $NOTIFICATIONSOURCE
+NOTIFICATIONSOURCE="$support_directory/notification_controller.sh" ; [ -f $NOTIFICATIONSOURCE ] && source $NOTIFICATIONSOURCE
 
 # ----------------------------------------------------------------------------------------
 # Set Program Variables
@@ -100,7 +100,8 @@ function addNewUserToBluetooth () {
 
 	#if nothing found; exit
 	if [ -z "$macaddress_new" ]; then 
-		notify "Note: No new bluetooth devices matching '$keyword' were found."
+		echo "No devices found."
+		notify "No new bluetooth devices matching '$keyword' were found."
 		return 0
 	fi
 
@@ -274,6 +275,7 @@ if [ ! -z "$1" ]; then
 		;;
 		-p|--pair )
 			addNewUserToBluetooth $2
+			echo "Exiting."
 			exit 1
 		;;
 	esac

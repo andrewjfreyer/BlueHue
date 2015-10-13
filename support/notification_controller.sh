@@ -7,7 +7,7 @@
 # Written by Andrew J Freyer
 
 #Load the credential pages again
-source /home/pi/hue/support/notification_credentials
+source /home/pi/hue/support/credentials_notification
 
 function notifyViaPushover () {
 	if [ ! -z $PushoverUserKey ] && [ ! -z $PushoverToken ];then 
