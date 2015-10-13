@@ -62,7 +62,7 @@ Turn [Philips Hue lights](http://www.meethue.com) on with a [Raspberry Pi](http:
 
 6. Reboot or Launch
 
-  `sudo /etc/init.d/bluehue`
+  `sudo /etc/init.d/bluehue start`
 
 
 
