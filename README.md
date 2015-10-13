@@ -40,7 +40,7 @@ Turn [Philips Hue lights](http://www.meethue.com) on with a [Raspberry Pi](http:
   `sudo apt-get install bluetooth bluez-utils blueman`
 
 
-3. Pair the bluetooth device:
+3. Pair the Bluetooth device
 
 	Instructions: set the device to discoverable mode, then (optionally) set search string for device name (default is 'iphone'):
 
