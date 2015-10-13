@@ -1,21 +1,26 @@
 BlueHue
 =======
 
-Bluetooth Proximity Switch for Activiating [Philips Hue Lights](http://meethue.com/)
+Multi-User Bluetooth Proximity Switch for Activiating [Philips Hue Lights](http://meethue.com/)
 
 * Designed around [hcitool](http://linuxcommand.org/man_pages/hcitool1.html)
 * Designed for [Raspberry Pi](http://www.raspberrypi.org/) with a cheap [Bluetooth Dongle](http://www.amazon.com/SANOXY%C2%AE-Bluetooth-Wireless-Adapter-eMachine/dp/B003VWU79I/ref=pd_sim_pc_1?ie=UTF8&refRID=16KWQH2VYRTN82GTNS70). 
 * Does not re-set light state/color changes made with App until bluetooth proximity state changes
 * Bluetooth queries are efficient so as to not impact portable device battery
 * Works with [PushOver](http://www.pushover.net) service for alerts & notifications
+* Works with any number of devices; if any one of the devices is detected, lights will stay on
 
 Based on a slightly modified [hue_bashlibrary](https://github.com/markusproske/hue_bashlibrary) by [markusproske](https://github.com/markusproske)
 
 <h2>TL;DR</h2>
 
-[![YouTube Video of Simulated Arrival](http://img.youtube.com/vi/JVYdRJQqmJA/0.jpg)](http://www.youtube.com/watch?v=JVYdRJQqmJA)
+Hue lights turn on when your Bluetooth device arrives home, turn off when your Bluetooth device leaves. Works with multiple users. 
 
-Turn [Philips Hue lights](http://www.meethue.com) on with a [Raspberry Pi](http://www.raspberrypi.org/) (or other server) upon arriving home and off upon leaving without the delays of IFTTT or inaccuracies and battery drain associated with geofencing via the [Philips Hue app](https://itunes.apple.com/us/app/philips-hue/id557206189?mt=8). 
+Watch the video below, noting that an *intentional* delay of three seconds is implemented from the time the notification appears and the time lights are turned on in the video. This delay is configurable. The delay is included so that the lights don't turn on *immediately* when detected (e.g., arrived, but still outside the door). 
+
+[![YouTube Video of Simulated Arrival](http://img.youtube.com/vi/JVYdRJQqmJA/0.jpg)](http://www.youtube.com/watch?v=JVYdRJQqmJA) 
+
+Turn [Philips Hue lights](http://www.meethue.com) on with a [Raspberry Pi](http://www.raspberrypi.org/) (or other server) upon arriving home and off upon leaving without the delays of IFTTT or inaccuracies and battery drain associated with geofencing via the [Philips Hue app](https://itunes.apple.com/us/app/philips-hue/id557206189?mt=8). Have multiple users turn lights on and off. 
 
 <h2>Summary</h2>
 
