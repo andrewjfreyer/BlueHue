@@ -40,9 +40,16 @@ Turn [Philips Hue lights](http://www.meethue.com) on with a [Raspberry Pi](http:
   `sudo apt-get install bluetooth bluez-utils blueman`
 
 
-3. Trigger a "pairing" event. (UNDER DEVELOPMENT)
+3. Pair the bluetooth device with search string for device name (default is 'iPhone'):
 
-3. Add init.d
+	Instructions: set the device to discoverable mode, then:
+
+	`sudo bash blue_hue.sh -p|--pair [search]`
+
+	A pairing request from "BlueHueProximity-####" will be made to the device where #### is the pin to enter. 
+
+
+4. Add init.d
 
   `if [ "$1" == "start" ]; then bash /home/pi/hue/blue_hue.sh true & ;  fi`
 
@@ -50,10 +57,10 @@ Turn [Philips Hue lights](http://www.meethue.com) on with a [Raspberry Pi](http:
   
   `sudo update-rc.d bluehue defaults`
   
-4. Add information to credentials and/or configuration file(s)
+5. Add information to credentials and/or configuration file(s)
 
 
-5. Reboot or Launch
+6. Reboot or Launch
 
   `sudo /etc/init.d/bluehue`
 
