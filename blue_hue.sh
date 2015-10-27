@@ -195,6 +195,8 @@ function refreshIPAddress () {
 # ----------------------------------------------------------------------------------------
 
 function lightStatus () {
+	#set the mode if $1 is defined
+
 	#count the lights that are turned on to get the current status
 	alllightstatus=$(curl -s $ip/api/$username/ | grep -Eo "\"lights\".*?\"groups\"" | sed 's/"name"/\n"name"/g')
 
@@ -210,8 +212,12 @@ function lightStatus () {
 	#total lights
 	countoflights=$(echo "$alllightstatus" | grep -io "\"name\":" | wc -l)
 
-	#formatted as sentence; not parsed
-	echo "$countoflightson light(s) ON, $((reachableLightsCount - countoflightson)) light(s) OFF, $((countoflights - reachableLightsCount)) light(s) UNR."
+	#formatted as sentence; not parsed; option for only selecting lights on
+	if [ -z "$1" ]; then  
+		echo "$countoflightson light(s) ON, $((reachableLightsCount - countoflightson)) light(s) OFF, $((countoflights - reachableLightsCount)) light(s) UNR."
+	else
+		echo "$countoflightson light(s) ON"		
+	fi
 }
 
 # ----------------------------------------------------------------------------------------
@@ -361,7 +367,7 @@ while (true); do
 				if [ "$statusCheckIterator" -gt $awayIterationMax ] ; then 
 
 					#get new light status
-					newlightstatusstrings=$(lightStatus)
+					newlightstatusstrings=$(lightStatus "1")
 
 					if [ "$currentLightStatusString" != "$newlightstatusstrings" ]; then 
 						#reset the variable holder
