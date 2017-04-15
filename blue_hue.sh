@@ -16,7 +16,7 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=3.1.5
+Version=3.1.6
 
 #find the support directory
 support_directory="/home/pi/hue/support"
@@ -314,14 +314,14 @@ while (true); do
 			if [ "$btNameScanResultTrimmed" != "" ]; then
 
  				#if at least one device was found continue
-				/usr/bin/mosquitto_pub -t $topicpath -m 'Present: $btNameScanResultTrimmed'
+				/usr/bin/mosquitto_pub -t $topicpath -m "Present: $btNameScanResultTrimmed"
 
 				#update status array
 				userStatus[$index]=1
 
   			else
   				#mqtt
-  				/usr/bin/mosquitto_pub -t $topicpath -m 'Absent: $btNameScanResultTrimmed'
+  				/usr/bin/mosquitto_pub -t $topicpath -m "Absent: $btNameScanResultTrimmed"
 				
 				#update status array
 				userStatus[$index]=0
@@ -330,6 +330,9 @@ while (true); do
 				sleep $delaybetweenscan
  			fi
 		done
+
+		#should scan through 
+
 
 		#none of the bluetooth devices are present
 		if [ "$btNameScanResultTrimmed" == "" ]; then
@@ -360,7 +363,7 @@ while (true); do
 			if [ "$laststatus" != 1 ]; then  
 
 				#publish to mqtt topic
-				/usr/bin/mosquitto_pub -t $topicpath -m 'Occupied: $btNameScanResultTrimmed'
+				/usr/bin/mosquitto_pub -t $topicpath -m "Occupied: $btNameScanResultTrimmed"
 
 				#bluetooth device arrived, but a status has been determined
 				notify "Welcome home!\n$btNameScanResultTrimmed"
