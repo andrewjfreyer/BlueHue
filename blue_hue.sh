@@ -16,7 +16,7 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=3.1.6
+Version=3.1.7
 
 #find the support directory
 support_directory="/home/pi/hue/support"
@@ -289,6 +289,10 @@ notify "BlueHue (v. $Version) started."
 # Set Main Program Loop
 # ----------------------------------------------------------------------------------------
 
+#status array
+userStatus=()
+userNames=()
+
 #begin the operational loop
 while (true); do	
 
@@ -297,9 +301,7 @@ while (true); do
 	do 
 		#cache bluetooth results 
 		btNameScanResultTrimmed=""
-
-		#status array
-		userStatus=()
+		atLeastOneUserStatusChanged=""
 
 		#searching from array-formatted credential file 
 		for index in "${!macaddress[@]}"
@@ -313,29 +315,43 @@ while (true); do
 			
 			if [ "$btNameScanResultTrimmed" != "" ]; then
 
- 				#if at least one device was found continue
-				/usr/bin/mosquitto_pub -t $topicpath -m "Present: $btNameScanResultTrimmed"
+				#this user's status changed
+				if [ userStatus[$index] != 1 ]; then 
+					#if at least one device was found continue
+					/usr/bin/mosquitto_pub -t $topicpath -m "Present: $index"
 
-				#update status array
-				userStatus[$index]=1
+					#update status array
+					userStatus[$index]=1
+
+					#update name
+					userNames[$index]="$btNameScanResultTrimmed"
+
+					#status change
+					atLeastOneUserStatusChanged=1
+				fi 
 
   			else
-  				#mqtt
-  				/usr/bin/mosquitto_pub -t $topicpath -m "Absent: $btNameScanResultTrimmed"
-				
-				#update status array
-				userStatus[$index]=0
+
+  				#this user's status changed
+				if [ userStatus[$index] != 0 ]; then 
+
+	  				#mqtt
+	  				/usr/bin/mosquitto_pub -t $topicpath -m "Absent: $index"
+					
+					#update status array
+					userStatus[$index]=0
+
+					#status change
+					atLeastOneUserStatusChanged=1
+				fi 
  				
  				#else, continue with scan list
 				sleep $delaybetweenscan
  			fi
 		done
 
-		#should scan through 
-
-
 		#none of the bluetooth devices are present
-		if [ "$btNameScanResultTrimmed" == "" ]; then
+		if [ "$atLeastOneUserStatusChanged" == "" ]; then
 			if [ "$laststatus" != 0 ]; then  
 				if [ "$repetition" -eq $verifyrepetitions ] ; then 
 
@@ -363,7 +379,7 @@ while (true); do
 			if [ "$laststatus" != 1 ]; then  
 
 				#publish to mqtt topic
-				/usr/bin/mosquitto_pub -t $topicpath -m "Occupied: $btNameScanResultTrimmed"
+				/usr/bin/mosquitto_pub -t $topicpath -m "Occupied"
 
 				#bluetooth device arrived, but a status has been determined
 				notify "Welcome home!\n$btNameScanResultTrimmed"
