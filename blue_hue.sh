@@ -282,7 +282,7 @@ numberofclients=$((${#macaddress[@]}))
 notify "BlueHue (v. $Version) started."
 
 #mqtt notification
-/usr/bin/mosquitto_pub -t '$topicpath' -m 'Started'
+/usr/bin/mosquitto_pub -t $topicpath -m 'Started'
 
 
 # ----------------------------------------------------------------------------------------
@@ -314,14 +314,14 @@ while (true); do
 			if [ "$btNameScanResultTrimmed" != "" ]; then
 
  				#if at least one device was found continue
-				/usr/bin/mosquitto_pub -t '$topicpath' -m 'Present: $btNameScanResultTrimmed'
+				/usr/bin/mosquitto_pub -t $topicpath -m 'Present: $btNameScanResultTrimmed'
 
 				#update status array
 				userStatus[$index]=1
 
   			else
   				#mqtt
-  				/usr/bin/mosquitto_pub -t '$topicpath' -m 'Absent: $btNameScanResultTrimmed'
+  				/usr/bin/mosquitto_pub -t $topicpath -m 'Absent: $btNameScanResultTrimmed'
 				
 				#update status array
 				userStatus[$index]=0
@@ -337,7 +337,7 @@ while (true); do
 				if [ "$repetition" -eq $verifyrepetitions ] ; then 
 
 					#publish status
-					/usr/bin/mosquitto_pub -t '$topicpath' -m 'Vacant'
+					/usr/bin/mosquitto_pub -t $topicpath -m 'Vacant'
 
 					#bluetooth device left
 					notify "Goodbye."
@@ -360,7 +360,7 @@ while (true); do
 			if [ "$laststatus" != 1 ]; then  
 
 				#publish to mqtt topic
-				/usr/bin/mosquitto_pub -t '$topicpath' -m 'Occupied: $btNameScanResultTrimmed'
+				/usr/bin/mosquitto_pub -t $topicpath -m 'Occupied: $btNameScanResultTrimmed'
 
 				#bluetooth device arrived, but a status has been determined
 				notify "Welcome home!\n$btNameScanResultTrimmed"
