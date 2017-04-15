@@ -16,7 +16,7 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=3.1.4
+Version=3.1.5
 
 #find the support directory
 support_directory="/home/pi/hue/support"
