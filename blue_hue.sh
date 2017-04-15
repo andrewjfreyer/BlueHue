@@ -16,7 +16,7 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=3.1.3
+Version=3.1.4
 
 #find the support directory
 support_directory="/home/pi/hue/support"
@@ -279,7 +279,11 @@ defaultwait=0
 numberofclients=$((${#macaddress[@]}))
 
 #notify the current state along with 
-notify "BlueHue Proximity (v. $Version) started."
+notify "BlueHue (v. $Version) started."
+
+#mqtt notification
+/usr/bin/mosquitto_pub -t '$topicpath' -m 'Started'
+
 
 # ----------------------------------------------------------------------------------------
 # Set Main Program Loop
@@ -308,15 +312,16 @@ while (true); do
 			btNameScanAtLeastOneDevicePresent=$(echo "$btNameScanResultTrimmed" | grep -icE "[a-z0-9]")
 			
 			if [ "$btNameScanResultTrimmed" != "" ]; then
+
  				#if at least one device was found continue
-				mosquitto_pub -t '$topicpath' -m 'Present: $btNameScanResultTrimmed'
+				/usr/bin/mosquitto_pub -t '$topicpath' -m 'Present: $btNameScanResultTrimmed'
 
 				#update status array
 				userStatus[$index]=1
 
   			else
   				#mqtt
-  				mosquitto_pub -t '$topicpath' -m 'Absent: $btNameScanResultTrimmed'
+  				/usr/bin/mosquitto_pub -t '$topicpath' -m 'Absent: $btNameScanResultTrimmed'
 				
 				#update status array
 				userStatus[$index]=0
@@ -332,7 +337,7 @@ while (true); do
 				if [ "$repetition" -eq $verifyrepetitions ] ; then 
 
 					#publish status
-					mosquitto_pub -t '$topicpath' -m 'Vacant'
+					/usr/bin/mosquitto_pub -t '$topicpath' -m 'Vacant'
 
 					#bluetooth device left
 					notify "Goodbye."
@@ -355,7 +360,7 @@ while (true); do
 			if [ "$laststatus" != 1 ]; then  
 
 				#publish to mqtt topic
-				mosquitto_pub -t '$topicpath' -m 'Occupied: $btNameScanResultTrimmed'
+				/usr/bin/mosquitto_pub -t '$topicpath' -m 'Occupied: $btNameScanResultTrimmed'
 
 				#bluetooth device arrived, but a status has been determined
 				notify "Welcome home!\n$btNameScanResultTrimmed"
