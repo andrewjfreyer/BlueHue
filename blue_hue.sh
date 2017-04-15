@@ -16,11 +16,14 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=3.1.1
+Version=3.1.3
 
 #find the support directory
 support_directory="/home/pi/hue/support"
 main_directory="/home/pi/hue"
+
+#mosquitto 
+topicpath="bluehue/presence"
 
 #source the support files
 source "$support_directory/hue_bashlibrary.sh"
@@ -177,7 +180,7 @@ function addNewUserToBluetooth () {
 # GET THE IP OF THE BRIDGE
 # ----------------------------------------------------------------------------------------
 
-function refreshIPAddress () {
+function refreshHueHubIPAddress () {
 	ip=$(cat "$support_directory/hue_ip")
 	verifybridge=$(curl -m 1 -s "$ip/api" | grep -c "not available for resource")
 
@@ -187,36 +190,6 @@ function refreshIPAddress () {
 	if [ -z "$ipaddress" ] || [ "$verifybridge" != "1" ]; then 
 		ip=$(curl -s -L http://www.meethue.com/api/nupnp | grep -ioE "[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}")
 		echo "$ip" > "$support_directory/hue_ip"
-	fi
-}
-
-# ----------------------------------------------------------------------------------------
-# GET THE STATUS STRING OF THE LIGHTS
-# ----------------------------------------------------------------------------------------
-
-function lightStatus () {
-	#set the mode if $1 is defined
-
-	#count the lights that are turned on to get the current status
-	alllightstatus=$(curl -s $ip/api/$username/ | grep -Eo "\"lights\".*?\"groups\"" | sed 's/"name"/\n"name"/g')
-
-	#find only reachable lights
-	reachableLights=$(echo "$alllightstatus" | grep "\"reachable\":true")
-	
-	#reachable light count
-	reachableLightsCount=$(echo "$reachableLights" | wc -l)
-
-	#now, of the reachable lights:
-	countoflightson=$(echo "$reachableLights" | grep -ioc "\"on\":true")
-
-	#total lights
-	countoflights=$(echo "$alllightstatus" | grep -io "\"name\":" | wc -l)
-
-	#formatted as sentence; not parsed; option for only selecting lights on
-	if [ -z "$1" ]; then  
-		echo "$countoflightson light(s) ON, $((reachableLightsCount - countoflightson)) light(s) OFF, $((countoflights - reachableLightsCount)) light(s) UNR."
-	else
-		echo "$countoflightson light(s) ON"		
 	fi
 }
 
@@ -293,7 +266,7 @@ fi
 # ----------------------------------------------------------------------------------------
 
 #make sure that we have the most recent IP address of the Hue Bridge
-refreshIPAddress
+refreshHueHubIPAddress
 
 #set default variables; this variable is reset during the operation loop; just a placeholder
 defaultwait=0
@@ -302,20 +275,11 @@ defaultwait=0
 # Preliminary Notifications
 # ----------------------------------------------------------------------------------------
 
-statusOfLightsString=$(lightStatus)
-
 #Number of clients that are monitored
 numberofclients=$((${#macaddress[@]}))
 
 #notify the current state along with 
-notify "BlueHue Proximity (v. $Version) started by user $(whoami); $statusOfLightsString ($numberofclients users)."
-
-
-#prepare necessary variables
-currentLightStatusString="$statusOfLightsString"
-
-#status check iterator
-statusCheckIterator=0
+notify "BlueHue Proximity (v. $Version) started."
 
 # ----------------------------------------------------------------------------------------
 # Set Main Program Loop
@@ -328,7 +292,10 @@ while (true); do
 	for repetition in $(seq 1 $verifyrepetitions); 
 	do 
 		#cache bluetooth results 
-		bluetoothscanresults=""
+		btNameScanResultTrimmed=""
+
+		#status array
+		userStatus=()
 
 		#searching from array-formatted credential file 
 		for index in "${!macaddress[@]}"
@@ -337,71 +304,65 @@ while (true); do
 			searchdeviceaddress="${macaddress[$index]}"
 
 			#obtain results and append each to the same
-			bluetoothscanresults="$bluetoothscanresults$(hcitool name "$searchdeviceaddress" 2>&1 | grep -v 'not available')"
-			bluetoothdevicepresent=$(echo "$bluetoothscanresults" | grep -icE "[a-z0-9]")
+			btNameScanResultTrimmed="$btNameScanResultTrimmed$(hcitool name "$searchdeviceaddress" 2>&1 | grep -v 'not available')"
+			btNameScanAtLeastOneDevicePresent=$(echo "$btNameScanResultTrimmed" | grep -icE "[a-z0-9]")
 			
-			if [ "$bluetoothscanresults" != "" ]; then
+			if [ "$btNameScanResultTrimmed" != "" ]; then
  				#if at least one device was found continue
- 				break
- 			else
+				mosquitto_pub -t '$topicpath' -m 'Present: $btNameScanResultTrimmed'
+
+				#update status array
+				userStatus[$index]=1
+
+  			else
+  				#mqtt
+  				mosquitto_pub -t '$topicpath' -m 'Absent: $btNameScanResultTrimmed'
+				
+				#update status array
+				userStatus[$index]=0
+ 				
  				#else, continue with scan list
 				sleep $delaybetweenscan
  			fi
 		done
 
 		#none of the bluetooth devices are present
-		if [ "$bluetoothscanresults" == "" ]; then
+		if [ "$btNameScanResultTrimmed" == "" ]; then
 			if [ "$laststatus" != 0 ]; then  
 				if [ "$repetition" -eq $verifyrepetitions ] ; then 
+
+					#publish status
+					mosquitto_pub -t '$topicpath' -m 'Vacant'
+
 					#bluetooth device left
 					notify "Goodbye."
-					refreshIPAddress
+					refreshHueHubIPAddress
 					hue_alloff
 					laststatus=0
 					defaultwait=$delaywhileabsent
 					break
 				fi
 			else
-
-				#inject an option to search for lights changes
-				if [ "$statusCheckIterator" -gt $awayIterationMax ] ; then 
-
-					#get new light status
-					newlightstatusstrings=$(lightStatus "1")
-
-					if [ "$currentLightStatusString" != "$newlightstatusstrings" ]; then 
-						#reset the variable holder
-						currentLightStatusString="$newlightstatusstrings"
-
-						#notify
-						notify "Light status changed to: $currentLightStatusString"
-					fi
-
-					#reset the counter
-					statusCheckIterator=0
-				
-				else
-					#iterate the counter
-					statusCheckIterator=$((statusCheckIterator+1))
-				fi
-
 				#bluetooth device remains absent
 				defaultwait=$delaywhileabsent
 				break
 			fi 
+
+			#verifiying 
 			sleep "$delaywhileverify"
 
-		elif [ "$bluetoothdevicepresent" == "1" ]; then 
+		elif [ "$btNameScanAtLeastOneDevicePresent" == "1" ]; then 
 			if [ "$laststatus" != 1 ]; then  
+
+				#publish to mqtt topic
+				mosquitto_pub -t '$topicpath' -m 'Occupied: $btNameScanResultTrimmed'
+
 				#bluetooth device arrived, but a status has been determined
-				notify "Welcome home. ($bluetoothscanresults)"
-				refreshIPAddress
+				notify "Welcome home!\n$btNameScanResultTrimmed"
+				refreshHueHubIPAddress
 				sleep $defaultdelaybeforeon 
 				hue_allon_custom
 				laststatus=1
-
-				#reset to 0
-				statusCheckIterator=0
 
 			else
 				#bluetooth device remains present.
