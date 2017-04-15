@@ -16,7 +16,7 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=3.1.10
+Version=3.1.11
 
 #find the support directory
 support_directory="/home/pi/hue/support"
@@ -315,16 +315,16 @@ while (true); do
 		if [ "$nameScanResult" != "" ]; then
 
 			#this user's status changed
-			if [ userStatus[$index] != "1" ]; then 
+			if [ userStatus["$index"] != "1" ]; then 
 				#if at least one device was found continue
 				/usr/bin/mosquitto_pub -t $topicpath -m "{user:\"$searchdeviceaddress\",present:\"true\"}"
 
 				#update status array
-				userStatus[$index]="2"
+				userStatus["$index"]="2"
 			
 			else 
 				#keep the status at 'present'
-				userStatus[$index]="1"
+				userStatus["$index"]="1"
 			fi 
 
 			#continue with scan list
@@ -333,20 +333,20 @@ while (true); do
 		else
 
 				#this user's status changed
-			if [ userStatus[$index] != "-1" ]; then 
+			if [ userStatus["$index"] != "-1" ]; then 
 
   				#mqtt
   				/usr/bin/mosquitto_pub -t $topicpath -m "{user:\"$searchdeviceaddress\",present:\"false\"}"
 				
 				#update status array
-				userStatus[$index]="-2"
+				userStatus["$index"]="-2"
 			else 
 				#keep the status at 'present'
-				userStatus[$index]="-1"
+				userStatus["$index"]="-1"
 			fi 
 			
 			#continue with scan list
-		sleep $delaybetweenscan
+			sleep $delaybetweenscan
 		fi
 	done
 
