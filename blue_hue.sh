@@ -16,7 +16,7 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=3.1.7
+Version=3.1.8
 
 #find the support directory
 support_directory="/home/pi/hue/support"
@@ -291,112 +291,117 @@ notify "BlueHue (v. $Version) started."
 
 #status array
 userStatus=()
-userNames=()
+laststatus=1
+currentstatus=1
 
 #begin the operational loop
 while (true); do	
 
-	#repeat for X times to verify that all bluetooth devices have left
-	for repetition in $(seq 1 $verifyrepetitions); 
-	do 
+	#--------------------------------------
+	#	UPDATE STATUS OF ALL USERS
+	#--------------------------------------
+	for index in "${!macaddress[@]}"
+	do
 		#cache bluetooth results 
-		btNameScanResultTrimmed=""
-		atLeastOneUserStatusChanged=""
+		nameScanResult=""
 
-		#searching from array-formatted credential file 
-		for index in "${!macaddress[@]}"
-		do
-			#obtain individual address
-			searchdeviceaddress="${macaddress[$index]}"
+		#obtain individual address
+		searchdeviceaddress="${macaddress[$index]}"
 
-			#obtain results and append each to the same
-			btNameScanResultTrimmed="$btNameScanResultTrimmed$(hcitool name "$searchdeviceaddress" 2>&1 | grep -v 'not available')"
-			btNameScanAtLeastOneDevicePresent=$(echo "$btNameScanResultTrimmed" | grep -icE "[a-z0-9]")
+		#obtain results and append each to the same
+		nameScanResult="$nameScanResult$(hcitool name "$searchdeviceaddress" 2>&1 | grep -v 'not available')"
+		
+		#this device name is present
+		if [ "$nameScanResult" != "" ]; then
+
+			#this user's status changed
+			if [ userStatus[$index] != "1" ]; then 
+				#if at least one device was found continue
+				/usr/bin/mosquitto_pub -t $topicpath -m "{user:\"searchdeviceaddress\",present:\"true\"}"
+
+				#update status array
+				userStatus[$index]="2"
 			
-			if [ "$btNameScanResultTrimmed" != "" ]; then
-
-				#this user's status changed
-				if [ userStatus[$index] != 1 ]; then 
-					#if at least one device was found continue
-					/usr/bin/mosquitto_pub -t $topicpath -m "Present: $index"
-
-					#update status array
-					userStatus[$index]=1
-
-					#update name
-					userNames[$index]="$btNameScanResultTrimmed"
-
-					#status change
-					atLeastOneUserStatusChanged=1
-				fi 
-
-  			else
-
-  				#this user's status changed
-				if [ userStatus[$index] != 0 ]; then 
-
-	  				#mqtt
-	  				/usr/bin/mosquitto_pub -t $topicpath -m "Absent: $index"
-					
-					#update status array
-					userStatus[$index]=0
-
-					#status change
-					atLeastOneUserStatusChanged=1
-				fi 
- 				
- 				#else, continue with scan list
-				sleep $delaybetweenscan
- 			fi
-		done
-
-		#none of the bluetooth devices are present
-		if [ "$atLeastOneUserStatusChanged" == "" ]; then
-			if [ "$laststatus" != 0 ]; then  
-				if [ "$repetition" -eq $verifyrepetitions ] ; then 
-
-					#publish status
-					/usr/bin/mosquitto_pub -t $topicpath -m 'Vacant'
-
-					#bluetooth device left
-					notify "Goodbye."
-					refreshHueHubIPAddress
-					hue_alloff
-					laststatus=0
-					defaultwait=$delaywhileabsent
-					break
-				fi
-			else
-				#bluetooth device remains absent
-				defaultwait=$delaywhileabsent
-				break
+			else 
+				#keep the status at 'present'
+				userStatus[$index]="1"
 			fi 
 
-			#verifiying 
-			sleep "$delaywhileverify"
+			#continue with scan list
+			sleep $delaybetweenscan
 
-		elif [ "$btNameScanAtLeastOneDevicePresent" == "1" ]; then 
-			if [ "$laststatus" != 1 ]; then  
-
-				#publish to mqtt topic
-				/usr/bin/mosquitto_pub -t $topicpath -m "Occupied"
-
-				#bluetooth device arrived, but a status has been determined
-				notify "Welcome home!\n$btNameScanResultTrimmed"
-				refreshHueHubIPAddress
-				sleep $defaultdelaybeforeon 
-				hue_allon_custom
-				laststatus=1
-
-			else
-				#bluetooth device remains present.
-				defaultwait=$delaywhilepresent
-			fi
-			break
 		else
-			echo "Unknown state."
+
+				#this user's status changed
+			if [ userStatus[$index] != "-1" ]; then 
+
+  				#mqtt
+  				/usr/bin/mosquitto_pub -t $topicpath -m "{user:\"searchdeviceaddress\",present:\"false\"}"
+				
+				#update status array
+				userStatus[$index]="-2"
+			else 
+				#keep the status at 'present'
+				userStatus[$index]="-1"
+			fi 
+			
+			#continue with scan list
+		sleep $delaybetweenscan
 		fi
 	done
+
+
+	#interate through status array to determine whether global status has changed
+	for currentUserStatus in "${userStatus[@]}"
+	do
+		#this user is present now
+		echo "$currentUserStatus"
+	done
+
+	#none of the bluetooth devices are present
+	if [ "$atLeastOneUserStatusChanged" == "" ]; then
+		if [ "$laststatus" != 0 ]; then  
+			#publish status
+			/usr/bin/mosquitto_pub -t $topicpath -m '{}}'
+			notify "Goodbye."
+
+			#bluetooth device left
+			refreshHueHubIPAddress
+			hue_alloff
+			laststatus=0
+			defaultwait=$delaywhileabsent
+			break
+
+		else
+			#bluetooth device remains absent
+			defaultwait=$delaywhileabsent
+			break
+		fi 
+
+		#verifiying 
+		sleep "$delaywhileverify"
+
+	elif [ "$atLeastOneUserStatusChanged" == "1" ]; then 
+		if [ "$laststatus" != 1 ]; then  
+
+			#publish to mqtt topic
+			/usr/bin/mosquitto_pub -t $topicpath -m "Occupied"
+			notify "Welcome home!"
+
+			#bluetooth device arrived, but a status has been determined
+			refreshHueHubIPAddress
+			sleep $defaultdelaybeforeon 
+			hue_allon_custom
+			laststatus=1
+
+		else
+			#bluetooth device remains present.
+			defaultwait=$delaywhilepresent
+		fi
+		break
+	else
+		echo "Unknown state."
+	fi
 
 	#next operation
 	sleep "$defaultwait"
