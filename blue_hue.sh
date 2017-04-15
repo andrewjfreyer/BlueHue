@@ -16,7 +16,7 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=3.1.8
+Version=3.1.9
 
 #find the support directory
 support_directory="/home/pi/hue/support"
@@ -317,7 +317,7 @@ while (true); do
 			#this user's status changed
 			if [ userStatus[$index] != "1" ]; then 
 				#if at least one device was found continue
-				/usr/bin/mosquitto_pub -t $topicpath -m "{user:\"searchdeviceaddress\",present:\"true\"}"
+				/usr/bin/mosquitto_pub -t $topicpath -m "{user:\"$searchdeviceaddress\",present:\"true\"}"
 
 				#update status array
 				userStatus[$index]="2"
@@ -336,7 +336,7 @@ while (true); do
 			if [ userStatus[$index] != "-1" ]; then 
 
   				#mqtt
-  				/usr/bin/mosquitto_pub -t $topicpath -m "{user:\"searchdeviceaddress\",present:\"false\"}"
+  				/usr/bin/mosquitto_pub -t $topicpath -m "{user:\"$searchdeviceaddress\",present:\"false\"}"
 				
 				#update status array
 				userStatus[$index]="-2"
@@ -358,11 +358,13 @@ while (true); do
 		echo "$currentUserStatus"
 	done
 
+	continue
+
 	#none of the bluetooth devices are present
 	if [ "$atLeastOneUserStatusChanged" == "" ]; then
 		if [ "$laststatus" != 0 ]; then  
 			#publish status
-			/usr/bin/mosquitto_pub -t $topicpath -m '{}}'
+			/usr/bin/mosquitto_pub -t $topicpath -m 'vacant'
 			notify "Goodbye."
 
 			#bluetooth device left
@@ -385,7 +387,7 @@ while (true); do
 		if [ "$laststatus" != 1 ]; then  
 
 			#publish to mqtt topic
-			/usr/bin/mosquitto_pub -t $topicpath -m "Occupied"
+			/usr/bin/mosquitto_pub -t $topicpath -m "occupied"
 			notify "Welcome home!"
 
 			#bluetooth device arrived, but a status has been determined
