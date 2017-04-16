@@ -16,7 +16,7 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=3.1.15
+Version=3.1.16
 
 #find the support directory
 support_directory="/home/pi/hue/support"
@@ -331,7 +331,7 @@ while (true); do
 				# 2 = status just changed to present
 				# 1 = status already present
 
-				echo "TEST: $($"${userStatus[$index]}")"
+				echo "TEST: ${userStatus[$index]}"
 
 				#only alert the first tiem
 				if [ $"${userStatus[$index]}" != "2" ]; then 
