@@ -16,14 +16,14 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=3.1.16
+Version=3.1.17
 
 #find the support directory
 support_directory="/home/pi/hue/support"
 main_directory="/home/pi/hue"
 
 #mosquitto 
-topicpath="bluehue/presence"
+topicpath="bluehue/presence" 
 
 #source the support files
 source "$support_directory/hue_bashlibrary.sh"
@@ -325,7 +325,7 @@ while (true); do
 		if [ "$nameScanResult" != "" ]; then
 
 			#this user's status changed
-			if [ "$"${userStatus[$index]}"" != "1" ]; then 
+			if [ "${userStatus[$index]}" != "1" ]; then 
 				#if at least one device was found continue
 
 				# 2 = status just changed to present
@@ -334,7 +334,7 @@ while (true); do
 				echo "TEST: ${userStatus[$index]}"
 
 				#only alert the first tiem
-				if [ $"${userStatus[$index]}" != "2" ]; then 
+				if [ "${userStatus[$index]}" != "2" ]; then 
 					/usr/bin/mosquitto_pub -t $topicpath -m "{user:\"$searchdeviceaddress\",present:\"true\"},name:\"$nameScanResult\""
 					userStatus[$index]="2"
 				else
@@ -348,16 +348,16 @@ while (true); do
 		else
 
 				#this user's status changed
-			if [ $"${userStatus[$index]}" != "-1" ]; then 
+			if [ "${userStatus[$index]}" != "-1" ]; then 
 
 				# -2 = status just changed to absent
 				# -1 = status already absent
 
-				if [ $"${userStatus[$index]}" != "-2" ]; then 
+				if [ "${userStatus[$index]}" != "-2" ]; then 
 					/usr/bin/mosquitto_pub -t $topicpath -m "{user:\"$searchdeviceaddress\",present:\"false\"}"
 				fi 
 				#update status array
-				userStatus[$index]}="-2"
+				userStatus[$index]="-2"
 			fi 
 			
 			#continue with scan list
