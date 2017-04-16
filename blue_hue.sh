@@ -16,7 +16,7 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=3.1.11
+Version=3.1.12
 
 #find the support directory
 support_directory="/home/pi/hue/support"
@@ -282,7 +282,7 @@ numberofclients=$((${#macaddress[@]}))
 notify "BlueHue (v. $Version) started."
 
 #mqtt notification
-/usr/bin/mosquitto_pub -t $topicpath -m 'Started'
+/usr/bin/mosquitto_pub -t $topicpath -m 'started: $version'
 
 
 # ----------------------------------------------------------------------------------------
@@ -309,7 +309,7 @@ while (true); do
 		searchdeviceaddress="${macaddress[$index]}"
 
 		#obtain results and append each to the same
-		nameScanResult="$nameScanResult$(hcitool name "$searchdeviceaddress" 2>&1 | grep -v 'not available')"
+		nameScanResult="$(hcitool name "$searchdeviceaddress" 2>&1 | grep -v 'not available')"
 		
 		#this device name is present
 		if [ "$nameScanResult" != "" ]; then
@@ -317,14 +317,17 @@ while (true); do
 			#this user's status changed
 			if [ userStatus["$index"] != "1" ]; then 
 				#if at least one device was found continue
-				/usr/bin/mosquitto_pub -t $topicpath -m "{user:\"$searchdeviceaddress\",present:\"true\"}"
 
-				#update status array
-				userStatus["$index"]="2"
-			
-			else 
-				#keep the status at 'present'
-				userStatus["$index"]="1"
+				# 2 = status just changed to present
+				# 1 = status already present
+
+				#only alert the first tiem
+				if [ userStatus["$index"] != "2" ]; then 
+					/usr/bin/mosquitto_pub -t $topicpath -m "{user:\"$searchdeviceaddress\",present:\"true\"},name:\"$nameScanResult\""
+					userStatus["$index"]="2"
+				else
+					userStatus["$index"]="1"
+				fi 
 			fi 
 
 			#continue with scan list
@@ -335,14 +338,14 @@ while (true); do
 				#this user's status changed
 			if [ userStatus["$index"] != "-1" ]; then 
 
-  				#mqtt
-  				/usr/bin/mosquitto_pub -t $topicpath -m "{user:\"$searchdeviceaddress\",present:\"false\"}"
-				
+				# -2 = status just changed to absent
+				# -1 = status already absent
+
+				if [ userStatus["$index"] != "-2" ]; then 
+					/usr/bin/mosquitto_pub -t $topicpath -m "{user:\"$searchdeviceaddress\",present:\"false\"}"
+				fi 
 				#update status array
 				userStatus["$index"]="-2"
-			else 
-				#keep the status at 'present'
-				userStatus["$index"]="-1"
 			fi 
 			
 			#continue with scan list
