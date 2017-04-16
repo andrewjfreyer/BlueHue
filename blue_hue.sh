@@ -16,7 +16,7 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=3.1.13
+Version=3.1.14
 
 #find the support directory
 support_directory="/home/pi/hue/support"
@@ -292,7 +292,7 @@ numberofclients=$((${#macaddress[@]}))
 notify "BlueHue (v. $Version) started."
 
 #mqtt notification
-/usr/bin/mosquitto_pub -t $topicpath -m 'started: $version'
+/usr/bin/mosquitto_pub -t $topicpath -m "started: $Version"
 
 
 # ----------------------------------------------------------------------------------------
@@ -325,20 +325,20 @@ while (true); do
 		if [ "$nameScanResult" != "" ]; then
 
 			#this user's status changed
-			if [ userStatus["$index"] != "1" ]; then 
+			if [ ${userStatus[$index]} != "1" ]; then 
 				#if at least one device was found continue
 
 				# 2 = status just changed to present
 				# 1 = status already present
 
-				echo "TEST: $(userStatus["$index"])"
+				echo "TEST: $(${userStatus[$index]})"
 
 				#only alert the first tiem
-				if [ userStatus["$index"] != "2" ]; then 
+				if [ ${userStatus[$index]} != "2" ]; then 
 					/usr/bin/mosquitto_pub -t $topicpath -m "{user:\"$searchdeviceaddress\",present:\"true\"},name:\"$nameScanResult\""
-					userStatus["$index"]="2"
+					${userStatus[$index]}="2"
 				else
-					userStatus["$index"]="1"
+					${userStatus[$index]}="1"
 				fi 
 			fi 
 
@@ -348,16 +348,16 @@ while (true); do
 		else
 
 				#this user's status changed
-			if [ userStatus["$index"] != "-1" ]; then 
+			if [ ${userStatus[$index]} != "-1" ]; then 
 
 				# -2 = status just changed to absent
 				# -1 = status already absent
 
-				if [ userStatus["$index"] != "-2" ]; then 
+				if [ ${userStatus[$index]} != "-2" ]; then 
 					/usr/bin/mosquitto_pub -t $topicpath -m "{user:\"$searchdeviceaddress\",present:\"false\"}"
 				fi 
 				#update status array
-				userStatus["$index"]="-2"
+				${userStatus[$index]}="-2"
 			fi 
 			
 			#continue with scan list
