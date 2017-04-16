@@ -16,7 +16,7 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=3.1.23
+Version=3.1.24
 
 #find the support directory
 support_directory="/home/pi/hue/support"
@@ -336,6 +336,9 @@ while (true); do
 					/usr/bin/mosquitto_pub -t $topicpath -m "{status: true, user:\"$searchdeviceaddress\",present:\"true\",name:\"$nameScanResult\"}"
 					userStatus[$index]="2"
 					countPresent=$((countPresent+1))
+
+					#if we have a state change; we should break to turn on lights faster!
+					break
 				else
 					userStatus[$index]="1"
 				fi 
@@ -374,6 +377,7 @@ while (true); do
 					if [ "$countPresent" -gt "0" ]; then  
 						countPresent=$((countPresent-1))
 					fi 
+
 					/usr/bin/mosquitto_pub -t $topicpath -m "{status: true, user:\"$searchdeviceaddress\",present:\"false\"}"
 				else
 					userStatus[$index]="-1"
