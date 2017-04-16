@@ -16,7 +16,7 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=3.1.18
+Version=3.1.20
 
 #find the support directory
 support_directory="/home/pi/hue/support"
@@ -292,7 +292,7 @@ numberofclients=$((${#macaddress[@]}))
 notify "BlueHue (v. $Version) started."
 
 #mqtt notification
-/usr/bin/mosquitto_pub -t $topicpath -m "started: $Version"
+/usr/bin/mosquitto_pub -t $topicpath -m "{status: true, version: $Version}"
 
 
 # ----------------------------------------------------------------------------------------
@@ -333,7 +333,7 @@ while (true); do
 
 				#only alert the first tiem
 				if [ "${userStatus[$index]}" != "2" ]; then 
-					/usr/bin/mosquitto_pub -t $topicpath -m "{user:\"$searchdeviceaddress\",present:\"true\"},name:\"$nameScanResult\""
+					/usr/bin/mosquitto_pub -t $topicpath -m "{status: true, user:\"$searchdeviceaddress\",present:\"true\",name:\"$nameScanResult\"}"
 					userStatus[$index]="2"
 				else
 					userStatus[$index]="1"
@@ -369,7 +369,7 @@ while (true); do
 
 				#if still absent
 				if [ "${userStatus[$index]}" != "-2" ]; then 
-					/usr/bin/mosquitto_pub -t $topicpath -m "{user:\"$searchdeviceaddress\",present:\"false\"}"
+					/usr/bin/mosquitto_pub -t $topicpath -m "{status: true, user:\"$searchdeviceaddress\",present:\"false\"}"
 				fi 
 				#update status array
 				userStatus[$index]="-2"
@@ -380,7 +380,7 @@ while (true); do
 		fi
 	done
 
-
+	echo "-----"
 	#interate through status array to determine whether global status has changed
 	for currentUserStatus in "${userStatus[@]}"
 	do
