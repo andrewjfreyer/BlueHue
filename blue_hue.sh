@@ -16,7 +16,7 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=3.1.17
+Version=3.1.18
 
 #find the support directory
 support_directory="/home/pi/hue/support"
@@ -331,8 +331,6 @@ while (true); do
 				# 2 = status just changed to present
 				# 1 = status already present
 
-				echo "TEST: ${userStatus[$index]}"
-
 				#only alert the first tiem
 				if [ "${userStatus[$index]}" != "2" ]; then 
 					/usr/bin/mosquitto_pub -t $topicpath -m "{user:\"$searchdeviceaddress\",present:\"true\"},name:\"$nameScanResult\""
@@ -353,6 +351,23 @@ while (true); do
 				# -2 = status just changed to absent
 				# -1 = status already absent
 
+				#should verify absense
+				for repetition in $(seq 1 $verifyrepetitions); 
+				do 
+					#perform scan
+					nameScanResultRepeat=$(scan $searchdeviceaddress)
+
+					#checkstan
+					if [ "$nameScanResultRepeat" != "" ]; then
+						#we know that we must have been at a previously-seen user status
+						userStatus[$index]="1"
+						break
+					fi 
+					#delay default time
+					sleep $delaybetweenscan
+				done
+
+				#if still absent
 				if [ "${userStatus[$index]}" != "-2" ]; then 
 					/usr/bin/mosquitto_pub -t $topicpath -m "{user:\"$searchdeviceaddress\",present:\"false\"}"
 				fi 
