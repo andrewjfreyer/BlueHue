@@ -16,14 +16,14 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=3.1.24
+Version=3.1.25
 
 #find the support directory
 support_directory="/home/pi/hue/support"
 main_directory="/home/pi/hue"
 
 #mosquitto 
-topicpath="bluehue/presence" 
+topicpath="location" 
 
 #source the support files
 source "$support_directory/hue_bashlibrary.sh"
@@ -316,10 +316,10 @@ while (true); do
 		nameScanResult=""
 
 		#obtain individual address
-		searchdeviceaddress="${macaddress[$index]}"
+		currentDeviceMAC="${macaddress[$index]}"
 
 		#obtain results and append each to the same
-		nameScanResult=$(scan $searchdeviceaddress)
+		nameScanResult=$(scan $currentDeviceMAC)
 		
 		#this device name is present
 		if [ "$nameScanResult" != "" ]; then
@@ -333,7 +333,7 @@ while (true); do
 
 				#only alert the first tiem
 				if [ "${userStatus[$index]}" != "2" ]; then 
-					/usr/bin/mosquitto_pub -t $topicpath -m "{status: true, user:\"$searchdeviceaddress\",present:\"true\",name:\"$nameScanResult\"}"
+					/usr/bin/mosquitto_pub -t "/$topicpath/$currentDeviceMAC" -m "{\"topic\":\"/location/$currentDeviceMAC\",payload:\"853 Elm\"}"
 					userStatus[$index]="2"
 					countPresent=$((countPresent+1))
 
@@ -359,7 +359,7 @@ while (true); do
 				for repetition in $(seq 1 $verifyrepetitions); 
 				do 
 					#perform scan
-					nameScanResultRepeat=$(scan $searchdeviceaddress)
+					nameScanResultRepeat=$(scan $currentDeviceMAC)
 
 					#checkstan
 					if [ "$nameScanResultRepeat" != "" ]; then
@@ -378,7 +378,7 @@ while (true); do
 						countPresent=$((countPresent-1))
 					fi 
 
-					/usr/bin/mosquitto_pub -t $topicpath -m "{status: true, user:\"$searchdeviceaddress\",present:\"false\"}"
+					/usr/bin/mosquitto_pub -t "/$topicpath/$currentDeviceMAC" -m "{\"topic\":\"/location/$currentDeviceMAC\",\"payload\":\"Out\"}"
 				else
 					userStatus[$index]="-1"
 				fi 
@@ -402,7 +402,7 @@ while (true); do
 		if [ "$laststatus" != 1 ]; then  
 
 			#publish to mqtt topic
-			/usr/bin/mosquitto_pub -t $topicpath -m "{status: true, occupied:\"true\"}"
+			/usr/bin/mosquitto_pub -t "$topicpath/occupied" -m "{payload:\"true\"}"
 			notify "Welcome home!"
 
 			#bluetooth device arrived, but a status has been determined
@@ -422,7 +422,7 @@ while (true); do
 
 		if [ "$laststatus" != 0 ]; then  
 			#publish status
-			/usr/bin/mosquitto_pub -t $topicpath -m "{status: true, occupied:\"false\"}"
+			/usr/bin/mosquitto_pub -t "$topicpath/occupied" -m "{payload:\"false\"}"
 			notify "Goodbye."
 
 			#bluetooth device left
