@@ -16,7 +16,7 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=3.1.12
+Version=3.1.13
 
 #find the support directory
 support_directory="/home/pi/hue/support"
@@ -204,6 +204,16 @@ function notify () {
 }
 
 # ----------------------------------------------------------------------------------------
+# Scan script
+# ----------------------------------------------------------------------------------------
+
+function scan () {
+	if [ ! -z "$1" ]; then 
+		echo $(hcitool name "$1" 2>&1 | grep -v 'not available')
+	fi
+}
+
+# ----------------------------------------------------------------------------------------
 # Print Help
 # ----------------------------------------------------------------------------------------
 
@@ -309,7 +319,7 @@ while (true); do
 		searchdeviceaddress="${macaddress[$index]}"
 
 		#obtain results and append each to the same
-		nameScanResult="$(hcitool name "$searchdeviceaddress" 2>&1 | grep -v 'not available')"
+		nameScanResult=$(scan $searchdeviceaddress)
 		
 		#this device name is present
 		if [ "$nameScanResult" != "" ]; then
@@ -320,6 +330,8 @@ while (true); do
 
 				# 2 = status just changed to present
 				# 1 = status already present
+
+				echo "TEST: $(userStatus["$index"])"
 
 				#only alert the first tiem
 				if [ userStatus["$index"] != "2" ]; then 
