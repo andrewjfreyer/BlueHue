@@ -16,7 +16,7 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=3.1.20
+Version=3.1.21
 
 #find the support directory
 support_directory="/home/pi/hue/support"
@@ -301,8 +301,7 @@ notify "BlueHue (v. $Version) started."
 
 #status array
 userStatus=()
-laststatus=1
-currentstatus=1
+countPresent=0
 
 #begin the operational loop
 while (true); do	
@@ -335,6 +334,7 @@ while (true); do
 				if [ "${userStatus[$index]}" != "2" ]; then 
 					/usr/bin/mosquitto_pub -t $topicpath -m "{status: true, user:\"$searchdeviceaddress\",present:\"true\",name:\"$nameScanResult\"}"
 					userStatus[$index]="2"
+					countPresent=$((countPresent+1))
 				else
 					userStatus[$index]="1"
 				fi 
@@ -369,6 +369,7 @@ while (true); do
 
 				#if still absent
 				if [ "${userStatus[$index]}" != "-2" ]; then 
+					countPresent=$((countPresent-1))
 					/usr/bin/mosquitto_pub -t $topicpath -m "{status: true, user:\"$searchdeviceaddress\",present:\"false\"}"
 				fi 
 				#update status array
@@ -380,7 +381,11 @@ while (true); do
 		fi
 	done
 
-	echo "-----"
+	#-------------------------------------------------------
+	# DETERMINE GLOBAL STATUS; VACANT OR OCCUPIED
+	#-------------------------------------------------------
+	echo "Present: $countPresent"
+
 	#interate through status array to determine whether global status has changed
 	for currentUserStatus in "${userStatus[@]}"
 	do
