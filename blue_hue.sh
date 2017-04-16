@@ -16,7 +16,7 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=3.1.21
+Version=3.1.23
 
 #find the support directory
 support_directory="/home/pi/hue/support"
@@ -302,6 +302,7 @@ notify "BlueHue (v. $Version) started."
 #status array
 userStatus=()
 countPresent=0
+laststatus=1
 
 #begin the operational loop
 while (true); do	
@@ -369,8 +370,13 @@ while (true); do
 
 				#if still absent
 				if [ "${userStatus[$index]}" != "-2" ]; then 
-					countPresent=$((countPresent-1))
+					#decrement the counter
+					if [ "$countPresent" -gt "0" ]; then  
+						countPresent=$((countPresent-1))
+					fi 
 					/usr/bin/mosquitto_pub -t $topicpath -m "{status: true, user:\"$searchdeviceaddress\",present:\"false\"}"
+				else
+					userStatus[$index]="-1"
 				fi 
 				#update status array
 				userStatus[$index]="-2"
@@ -384,45 +390,15 @@ while (true); do
 	#-------------------------------------------------------
 	# DETERMINE GLOBAL STATUS; VACANT OR OCCUPIED
 	#-------------------------------------------------------
-	echo "Present: $countPresent"
-
-	#interate through status array to determine whether global status has changed
-	for currentUserStatus in "${userStatus[@]}"
-	do
-		#this user is present now
-		echo "$currentUserStatus"
-	done
-
-	continue
-
+	
 	#none of the bluetooth devices are present
-	if [ "$atLeastOneUserStatusChanged" == "" ]; then
-		if [ "$laststatus" != 0 ]; then  
-			#publish status
-			/usr/bin/mosquitto_pub -t $topicpath -m 'vacant'
-			notify "Goodbye."
-
-			#bluetooth device left
-			refreshHueHubIPAddress
-			hue_alloff
-			laststatus=0
-			defaultwait=$delaywhileabsent
-			break
-
-		else
-			#bluetooth device remains absent
-			defaultwait=$delaywhileabsent
-			break
-		fi 
-
-		#verifiying 
-		sleep "$delaywhileverify"
-
-	elif [ "$atLeastOneUserStatusChanged" == "1" ]; then 
+	if [ "$countPresent" -gt "0" ]; then  
+		
+		#if we were not globally occupied, then alert
 		if [ "$laststatus" != 1 ]; then  
 
 			#publish to mqtt topic
-			/usr/bin/mosquitto_pub -t $topicpath -m "occupied"
+			/usr/bin/mosquitto_pub -t $topicpath -m "{status: true, occupied:\"true\"}"
 			notify "Welcome home!"
 
 			#bluetooth device arrived, but a status has been determined
@@ -435,9 +411,36 @@ while (true); do
 			#bluetooth device remains present.
 			defaultwait=$delaywhilepresent
 		fi
-		break
+
+	elif [ "$countPresent" == "0" ]; then 
+		
+		#if we were not vacant before...
+
+		if [ "$laststatus" != 0 ]; then  
+			#publish status
+			/usr/bin/mosquitto_pub -t $topicpath -m "{status: true, occupied:\"false\"}"
+			notify "Goodbye."
+
+			#bluetooth device left
+			refreshHueHubIPAddress
+			hue_alloff
+			laststatus=0
+			defaultwait=$delaywhileabsent
+
+		else
+			#bluetooth device remains absent
+			defaultwait=$delaywhileabsent
+		fi 
+
+		#verifiying 
+		sleep "$delaywhileverify"
 	else
+
+		#we are in an unknown statel something went wrong
 		echo "Unknown state."
+
+		#send error
+		/usr/bin/mosquitto_pub -t $topicpath -m "{status: false}"
 	fi
 
 	#next operation
