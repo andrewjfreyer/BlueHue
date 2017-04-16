@@ -16,7 +16,7 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=3.1.28
+Version=3.1.29
 
 #find the support directory
 support_directory="/home/pi/hue/support"
@@ -397,6 +397,7 @@ while (true); do
 
 			#publish to mqtt topic
 			notify "Welcome home!"
+			/usr/bin/mosquitto_pub -h "$mqtt_address" -u "$mqtt_user" -P "$mqtt_password" -t "$mqtt_topicpath/home" -m "Occupied"
 
 			#bluetooth device arrived, but a status has been determined
 			refreshHueHubIPAddress
@@ -416,6 +417,7 @@ while (true); do
 		if [ "$laststatus" != 0 ]; then  
 			#publish status
 			notify "Goodbye."
+			/usr/bin/mosquitto_pub -h "$mqtt_address" -u "$mqtt_user" -P "$mqtt_password" -t "$mqtt_topicpath/home" -m "Vacant"
 
 			#bluetooth device left
 			refreshHueHubIPAddress
