@@ -16,18 +16,16 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=3.1.25
+Version=3.1.26
 
 #find the support directory
 support_directory="/home/pi/hue/support"
 main_directory="/home/pi/hue"
 
-#mosquitto 
-topicpath="location" 
-
 #source the support files
 source "$support_directory/hue_bashlibrary.sh"
 source "$support_directory/credentials_api"
+source "$support_directory/credentials_mqtt"
 
 #if and only if we have a notification system enabled
 NOTIFICATIONSOURCE="$support_directory/notification_controller.sh" ; [ -f $NOTIFICATIONSOURCE ] && source $NOTIFICATIONSOURCE
@@ -292,7 +290,7 @@ numberofclients=$((${#macaddress[@]}))
 notify "BlueHue (v. $Version) started."
 
 #mqtt notification
-/usr/bin/mosquitto_pub -t $topicpath -m "{status: true, version: $Version}"
+/usr/bin/mosquitto_pub -t $mqtt_topicpath -m "{status: true, version: $Version}"
 
 
 # ----------------------------------------------------------------------------------------
@@ -333,7 +331,7 @@ while (true); do
 
 				#only alert the first tiem
 				if [ "${userStatus[$index]}" != "2" ]; then 
-					/usr/bin/mosquitto_pub -t "/$topicpath/$currentDeviceMAC" -m "{\"topic\":\"/location/$currentDeviceMAC\",payload:\"853 Elm\"}"
+					/usr/bin/mosquitto_pub -t "$mqtt_topicpath/$currentDeviceMAC" -m "$mqtt_home"
 					userStatus[$index]="2"
 					countPresent=$((countPresent+1))
 
@@ -378,7 +376,7 @@ while (true); do
 						countPresent=$((countPresent-1))
 					fi 
 
-					/usr/bin/mosquitto_pub -t "/$topicpath/$currentDeviceMAC" -m "{\"topic\":\"/location/$currentDeviceMAC\",\"payload\":\"Out\"}"
+					/usr/bin/mosquitto_pub -t "$mqtt_topicpath/$currentDeviceMAC" -m "$mqtt_away"
 				else
 					userStatus[$index]="-1"
 				fi 
@@ -402,7 +400,6 @@ while (true); do
 		if [ "$laststatus" != 1 ]; then  
 
 			#publish to mqtt topic
-			/usr/bin/mosquitto_pub -t "$topicpath/occupied" -m "{payload:\"true\"}"
 			notify "Welcome home!"
 
 			#bluetooth device arrived, but a status has been determined
@@ -422,7 +419,6 @@ while (true); do
 
 		if [ "$laststatus" != 0 ]; then  
 			#publish status
-			/usr/bin/mosquitto_pub -t "$topicpath/occupied" -m "{payload:\"false\"}"
 			notify "Goodbye."
 
 			#bluetooth device left
@@ -444,7 +440,7 @@ while (true); do
 		echo "Unknown state."
 
 		#send error
-		/usr/bin/mosquitto_pub -t $topicpath -m "{status: false}"
+		/usr/bin/mosquitto_pub -t $mqtt_topicpath -m "{status: false}"
 	fi
 
 	#next operation
