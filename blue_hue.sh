@@ -16,7 +16,7 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=3.1.29
+Version=3.1.30
 
 #find the support directory
 support_directory="/home/pi/hue/support"
@@ -327,7 +327,6 @@ while (true); do
 
 				#only alert the first tiem
 				if [ "${userStatus[$index]}" != "2" ]; then 
-					/usr/bin/mosquitto_pub -h "$mqtt_address" -u "$mqtt_user" -P "$mqtt_password" -t "$mqtt_topicpath/$currentDeviceMAC" -m "$mqtt_home"
 					userStatus[$index]="2"
 					countPresent=$((countPresent+1))
 
@@ -336,6 +335,9 @@ while (true); do
 				else
 					userStatus[$index]="1"
 				fi 
+
+				/usr/bin/mosquitto_pub -h "$mqtt_address" -u "$mqtt_user" -P "$mqtt_password" -t "$mqtt_topicpath/$currentDeviceMAC" -m "$mqtt_home"
+
 			fi 
 
 			#continue with scan list
@@ -372,10 +374,12 @@ while (true); do
 						countPresent=$((countPresent-1))
 					fi 
 
-					/usr/bin/mosquitto_pub -h "$mqtt_address" -u "$mqtt_user" -P "$mqtt_password" -t "$mqtt_topicpath/$currentDeviceMAC" -m "$mqtt_away"
 				else
 					userStatus[$index]="-1"
 				fi 
+
+				/usr/bin/mosquitto_pub -h "$mqtt_address" -u "$mqtt_user" -P "$mqtt_password" -t "$mqtt_topicpath/$currentDeviceMAC" -m "$mqtt_away"
+
 				#update status array
 				userStatus[$index]="-2"
 			fi 
