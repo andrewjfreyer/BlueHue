@@ -220,7 +220,7 @@ function help () {
 
 	#quick fake of a man page
 	echo "NAME"
-	echo "	blue_hue - bluetooth proximity for Philips Hue"
+	echo "	blue_hue - bluetooth proximity for Philips Hue/MQTT"
 	echo "	v. $Version"
 	echo "\n"
 	echo "SYNOPSIS"
@@ -287,7 +287,7 @@ defaultwait=0
 numberofclients=$((${#macaddress[@]}))
 
 #notify the current state along with 
-notify "BlueHue (v. $Version) started."
+notify "BlueMQTT (v. $Version) started."
 
 # ----------------------------------------------------------------------------------------
 # Set Main Program Loop
@@ -404,9 +404,9 @@ while (true); do
 			/usr/bin/mosquitto_pub -h "$mqtt_address" -u "$mqtt_user" -P "$mqtt_password" -t "$mqtt_topicpath/home" -m "Occupied"
 
 			#bluetooth device arrived, but a status has been determined
-			refreshHueHubIPAddress
+			#refreshHueHubIPAddress
 			sleep $defaultdelaybeforeon 
-			hue_allon_custom
+			#hue_allon_custom
 			laststatus=1
 
 		else
@@ -424,8 +424,8 @@ while (true); do
 			/usr/bin/mosquitto_pub -h "$mqtt_address" -u "$mqtt_user" -P "$mqtt_password" -t "$mqtt_topicpath/home" -m "Vacant"
 
 			#bluetooth device left
-			refreshHueHubIPAddress
-			hue_alloff
+			#refreshHueHubIPAddress
+			#hue_alloff
 			laststatus=0
 			defaultwait=$delaywhileabsent
 
