@@ -236,13 +236,6 @@ if [ ! -z "$1" ]; then
 fi 
 
 # ----------------------------------------------------------------------------------------
-# Prepare for Main Loop
-# ----------------------------------------------------------------------------------------
-
-#set default variables; this variable is reset during the operation loop; just a placeholder
-defaultwait=5
-
-# ----------------------------------------------------------------------------------------
 # Preliminary Notifications
 # ----------------------------------------------------------------------------------------
 
@@ -283,6 +276,8 @@ while (true); do
 
 		else
 
+			/usr/bin/mosquitto_pub -h "$mqtt_address" -u "$mqtt_user" -P "$mqtt_password" -t "$mqtt_topicpath/$currentDeviceMAC" -m "$mqtt_absent"
+
 			#should verify absense
 			for repetition in $(seq 1 $verifyrepetitions); 
 			do 
@@ -307,5 +302,5 @@ while (true); do
 	done
 
 	#next operation
-	sleep "$defaultwait"
+	sleep $delaybetweenscan
 done
