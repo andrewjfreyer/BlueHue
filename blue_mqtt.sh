@@ -16,7 +16,7 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=4.0.0
+Version=4.0.1
 
 #find the support directory
 support_directory="/home/pi/hue/support"
@@ -33,7 +33,7 @@ NOTIFICATIONSOURCE="$support_directory/notification_controller.sh" ; [ -f $NOTIF
 # ----------------------------------------------------------------------------------------
 
 delaybetweenscan=10		#advised for bluetooth hardware 
-verifyrepetitions=5 	#lower means more false rejection 
+verifyrepetitions=2 	#lower means more false rejection 
 
 
 #fill mac address array
@@ -240,7 +240,7 @@ fi
 # ----------------------------------------------------------------------------------------
 
 #set default variables; this variable is reset during the operation loop; just a placeholder
-defaultwait=0
+defaultwait=5
 
 # ----------------------------------------------------------------------------------------
 # Preliminary Notifications
