@@ -16,7 +16,7 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=4.0.1
+Version=4.0.2
 
 #find the support directory
 support_directory="/home/pi/hue/support"
@@ -275,8 +275,6 @@ while (true); do
 			sleep $delaybetweenscan
 
 		else
-
-			/usr/bin/mosquitto_pub -h "$mqtt_address" -u "$mqtt_user" -P "$mqtt_password" -t "$mqtt_topicpath/$currentDeviceMAC" -m "$mqtt_absent"
 
 			#should verify absense
 			for repetition in $(seq 1 $verifyrepetitions); 
