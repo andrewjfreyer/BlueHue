@@ -5,7 +5,7 @@
 # GENERAL INFORMATION
 # ----------------------------------------------------------------------------------------
 #
-# BlueHue - Bluetooth Proximity Switch for Hue Ligts
+# Blue_MQTT - Bluetooth Proximity 
 # Written by Andrew J Freyer
 # GNU General Public License
 #
@@ -16,15 +16,13 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=3.1.32
+Version=4.0.0
 
 #find the support directory
 support_directory="/home/pi/hue/support"
 main_directory="/home/pi/hue"
 
 #source the support files
-source "$support_directory/hue_bashlibrary.sh"
-source "$support_directory/credentials_api"
 source "$support_directory/credentials_mqtt"
 
 #if and only if we have a notification system enabled
@@ -34,14 +32,8 @@ NOTIFICATIONSOURCE="$support_directory/notification_controller.sh" ; [ -f $NOTIF
 # Set Program Variables
 # ----------------------------------------------------------------------------------------
 
-awayIterationMax=3 				#interations of 'away' mode after which light status is checked
-delaywhilepresent=80 			#higher means slower turn off when leaving
-delaywhileabsent=6 				#higher means slower recognition when turning on 
-delaywhileverify=3 				#higher means slower verification of absence times
-defaultdelaybeforeon=0			#higher means slower turn on
-delaybetweenscan=3				#advised for bluetooth hardware 
-verifyrepetitions=3 			#lower means more false rejection 
-ip=0.0.0.0 						#IP address filler
+delaybetweenscan=10		#advised for bluetooth hardware 
+verifyrepetitions=5 	#lower means more false rejection 
 
 
 #fill mac address array
@@ -49,15 +41,6 @@ IFS=$'\n' read -d '' -r -a macaddress < "$support_directory/credentials_user"
 
 #load the defaults, if the user wants to specify their own 
 CONFIGSOURCE=$main_directory/configuration ; [ -f $CONFIGSOURCE ] && source $CONFIGSOURCE
-
-# ----------------------------------------------------------------------------------------
-# Credential Information Verification
-# ----------------------------------------------------------------------------------------
-
-if [ -z "$devicetype" ] ||  [ -z "$username" ] || [ -z "$macaddress" ]; then 
-	echo "error: please supply credentials; at least one credential is missing"
-	exit 127
-fi
 
 # ----------------------------------------------------------------------------------------
 # PAIR A NEW USER
@@ -175,23 +158,6 @@ function addNewUserToBluetooth () {
 
 
 # ----------------------------------------------------------------------------------------
-# GET THE IP OF THE BRIDGE
-# ----------------------------------------------------------------------------------------
-
-function refreshHueHubIPAddress () {
-	ip=$(cat "$support_directory/hue_ip")
-	verifybridge=$(curl -m 1 -s "$ip/api" | grep -c "not available for resource")
-
-	#if we don't have an IP address from the cache or the bridge isn't responding, then 
-	#we grab the IP address from the UPnP json sent from the bridge with remote access
-	#enabled. 
-	if [ -z "$ipaddress" ] || [ "$verifybridge" != "1" ]; then 
-		ip=$(curl -s -L http://www.meethue.com/api/nupnp | grep -ioE "[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}")
-		echo "$ip" > "$support_directory/hue_ip"
-	fi
-}
-
-# ----------------------------------------------------------------------------------------
 # Notification Script... Should be modified for individual notifications
 # ----------------------------------------------------------------------------------------
 
@@ -220,21 +186,21 @@ function help () {
 
 	#quick fake of a man page
 	echo "NAME"
-	echo "	blue_hue - bluetooth proximity for Philips Hue/MQTT"
+	echo "	blue_mqtt - bluetooth proximity over MQTT"
 	echo "	v. $Version"
 	echo "\n"
 	echo "SYNOPSIS"
-	echo "	blue_hue  [-v|--version] [-h|--help]"
+	echo "	blue_mqtt  [-v|--version] [-h|--help]"
 	echo "\n"
 	echo "DESCRIPTION"
-	echo "	Control Philips Hue lights via bluetooth proximity of multiple devices"
+	echo "	Notify MQTT of bluetooth proximity of multiple devices"
 	echo "\n"
 	echo "OPTIONS"
 	echo "	-v|--version 	print version information"
 	echo "	-h|--help 	print this help file"
 	echo "	-p|--pair 	pair with new device"
 	echo "\n"
-	echo "	/support/credentials 	add Hue API and other information"
+	echo "	/support/credentials 	other information"
 	echo "\n"
 	echo "AUTHOR"
 	echo "	Andrew J. Freyer - 2015 (https://github.com/andrewjfreyer/)"
@@ -273,9 +239,6 @@ fi
 # Prepare for Main Loop
 # ----------------------------------------------------------------------------------------
 
-#make sure that we have the most recent IP address of the Hue Bridge
-refreshHueHubIPAddress
-
 #set default variables; this variable is reset during the operation loop; just a placeholder
 defaultwait=0
 
@@ -292,11 +255,6 @@ notify "BlueMQTT (v. $Version) started."
 # ----------------------------------------------------------------------------------------
 # Set Main Program Loop
 # ----------------------------------------------------------------------------------------
-
-#status array
-userStatus=()
-countPresent=0
-laststatus=1
 
 #begin the operational loop
 while (true); do	
@@ -318,130 +276,35 @@ while (true); do
 		#this device name is present
 		if [ "$nameScanResult" != "" ]; then
 
-			#this user's status changed
-			if [ "${userStatus[$index]}" != "1" ]; then 
-				#if at least one device was found continue
-
-				# 2 = status just changed to present
-				# 1 = status already present
-
-				#only alert the first tiem
-				if [ "${userStatus[$index]}" != "2" ]; then 
-					userStatus[$index]="2"
-					countPresent=$((countPresent+1))
-
-					#if we have a state change; we should break to turn on lights faster!
-					break
-				else
-					userStatus[$index]="1"
-				fi 
-
-				/usr/bin/mosquitto_pub -h "$mqtt_address" -u "$mqtt_user" -P "$mqtt_password" -t "$mqtt_topicpath/$currentDeviceMAC" -m "$mqtt_home"
-
-			fi 
-
+			/usr/bin/mosquitto_pub -h "$mqtt_address" -u "$mqtt_user" -P "$mqtt_password" -t "$mqtt_topicpath/$currentDeviceMAC" -m "$mqtt_home"
+			
 			#continue with scan list
 			sleep $delaybetweenscan
 
 		else
 
-				#this user's status changed
-			if [ "${userStatus[$index]}" != "-1" ]; then 
+			#should verify absense
+			for repetition in $(seq 1 $verifyrepetitions); 
+			do 
+				#perform scan
+				nameScanResultRepeat=$(scan $currentDeviceMAC)
 
-				# -2 = status just changed to absent
-				# -1 = status already absent
-
-				#should verify absense
-				for repetition in $(seq 1 $verifyrepetitions); 
-				do 
-					#perform scan
-					nameScanResultRepeat=$(scan $currentDeviceMAC)
-
-					#checkstan
-					if [ "$nameScanResultRepeat" != "" ]; then
-						#we know that we must have been at a previously-seen user status
-						userStatus[$index]="1"
-						break
-					fi 
-					#delay default time
-					sleep $delaybetweenscan
-				done
-
-				#if still absent
-				if [ "${userStatus[$index]}" != "-2" ]; then 
-					#decrement the counter
-					if [ "$countPresent" -gt "0" ]; then  
-						countPresent=$((countPresent-1))
-					fi 
-
-				else
-					userStatus[$index]="-1"
+				#checkstan
+				if [ "$nameScanResultRepeat" != "" ]; then
+					#we know that we must have been at a previously-seen user status
+					userStatus[$index]="1"
+					break
 				fi 
+				#delay default time
+				sleep $delaybetweenscan
+			done
 
-				/usr/bin/mosquitto_pub -h "$mqtt_address" -u "$mqtt_user" -P "$mqtt_password" -t "$mqtt_topicpath/$currentDeviceMAC" -m "$mqtt_away"
+			/usr/bin/mosquitto_pub -h "$mqtt_address" -u "$mqtt_user" -P "$mqtt_password" -t "$mqtt_topicpath/$currentDeviceMAC" -m "$mqtt_away"
 
-				#update status array
-				userStatus[$index]="-2"
-			fi 
-			
 			#continue with scan list
 			sleep $delaybetweenscan
 		fi
 	done
-
-	#-------------------------------------------------------
-	# DETERMINE GLOBAL STATUS; VACANT OR OCCUPIED
-	#-------------------------------------------------------
-	
-	#none of the bluetooth devices are present
-	if [ "$countPresent" -gt "0" ]; then  
-		
-		#if we were not globally occupied, then alert
-		if [ "$laststatus" != 1 ]; then  
-
-			#publish to mqtt topic
-			#notify "Welcome home!"
-			/usr/bin/mosquitto_pub -h "$mqtt_address" -u "$mqtt_user" -P "$mqtt_password" -t "$mqtt_topicpath/home" -m "Occupied"
-
-			#bluetooth device arrived, but a status has been determined
-			#refreshHueHubIPAddress
-			sleep $defaultdelaybeforeon 
-			#hue_allon_custom
-			laststatus=1
-
-		else
-			#bluetooth device remains present.
-			defaultwait=$delaywhilepresent
-		fi
-
-	elif [ "$countPresent" == "0" ]; then 
-		
-		#if we were not vacant before...
-
-		if [ "$laststatus" != 0 ]; then  
-			#publish status
-			#notify "Goodbye."
-			/usr/bin/mosquitto_pub -h "$mqtt_address" -u "$mqtt_user" -P "$mqtt_password" -t "$mqtt_topicpath/home" -m "Vacant"
-
-			#bluetooth device left
-			#refreshHueHubIPAddress
-			#hue_alloff
-			laststatus=0
-			defaultwait=$delaywhileabsent
-
-		else
-			#bluetooth device remains absent
-			defaultwait=$delaywhileabsent
-		fi 
-
-		#verifiying 
-		sleep "$delaywhileverify"
-	else
-
-		#we are in an unknown statel something went wrong
-		echo "Unknown state."
-
-	fi
 
 	#next operation
 	sleep "$defaultwait"

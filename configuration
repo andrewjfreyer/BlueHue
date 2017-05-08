@@ -1,8 +1,0 @@
-awayIterationMax=3 				#interations of 'away' mode after which light status is checked
-delaywhilepresent=80 			#higher means slower turn off when leaving
-delaywhileabsent=6 				#higher means slower recognition when turning on 
-delaywhileverify=3 				#higher means slower verification of absence times
-defaultdelaybeforeon=0			#higher means slower turn on
-delaybetweenscan=3				#advised for bluetooth hardware 
-verifyrepetitions=3 			#lower means more false rejection 
-ip=0.0.0.0 						#IP address filler
