@@ -16,7 +16,7 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=4.0.4
+Version=4.0.5
 
 #find the support directory
 support_directory="/home/pi/hue/support"
@@ -33,7 +33,7 @@ NOTIFICATIONSOURCE="$support_directory/notification_controller.sh" ; [ -f $NOTIF
 # ----------------------------------------------------------------------------------------
 
 delaybetweenscan=10		#advised for bluetooth hardware 
-verifyrepetitions=2 	#lower means more false rejection 
+verifyrepetitions=5 	#lower means more false rejection 
 
 
 #fill mac address array
@@ -288,11 +288,13 @@ while (true); do
 				$status = "0"
 			fi 
 
+			echo "Status: $status"
+
 			#should verify absense
 			for repetition in $(seq 1 $verifyrepetitions); 
 			do 
 				#get percentage
-				percentage=$(( $status * ( $verifyrepetitions - $repetition) / $verifyrepetitions))
+				percentage=$(($status * ( $verifyrepetitions - $repetition) / $verifyrepetitions))
 
 				#perform scan
 				nameScanResultRepeat=$(scan $currentDeviceMAC)
