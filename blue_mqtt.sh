@@ -16,7 +16,7 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=4.0.2
+Version=4.0.3
 
 #find the support directory
 support_directory="/home/pi/hue/support"
@@ -249,6 +249,9 @@ notify "BlueMQTT (v. $Version) started."
 # Set Main Program Loop
 # ----------------------------------------------------------------------------------------
 
+#status
+userStatus=()
+
 #begin the operational loop
 while (true); do	
 
@@ -269,30 +272,53 @@ while (true); do
 		#this device name is present
 		if [ "$nameScanResult" != "" ]; then
 
-			/usr/bin/mosquitto_pub -h "$mqtt_address" -u "$mqtt_user" -P "$mqtt_password" -t "$mqtt_topicpath/$currentDeviceMAC" -m "$mqtt_home"
-			
+			/usr/bin/mosquitto_pub -h "$mqtt_address" -u "$mqtt_user" -P "$mqtt_password" -t "$mqtt_topicpath/$currentDeviceMAC" -m "100"
+
+			#user status			
+			userStatus[$index]="100"
+
 			#continue with scan list
 			sleep $delaybetweenscan
 
 		else
+			#user status			
+			status="${userStatus[$index]}"
 
 			#should verify absense
 			for repetition in $(seq 1 $verifyrepetitions); 
 			do 
+				#get percentage
+				percentage=$(( $status * ( $verifyrepetitions - $repetition) / $verifyrepetitions))
+
 				#perform scan
 				nameScanResultRepeat=$(scan $currentDeviceMAC)
 
 				#checkstan
 				if [ "$nameScanResultRepeat" != "" ]; then
 					#we know that we must have been at a previously-seen user status
-					userStatus[$index]="1"
+
+					/usr/bin/mosquitto_pub -h "$mqtt_address" -u "$mqtt_user" -P "$mqtt_password" -t "$mqtt_topicpath/$currentDeviceMAC" -m "100"
+
+					userStatus[$index]="100"
 					break
 				fi 
+
+				#update percentage
+				userStatus[$index]="$percentage"
+
+				#report confidence drop
+				/usr/bin/mosquitto_pub -h "$mqtt_address" -u "$mqtt_user" -P "$mqtt_password" -t "$mqtt_topicpath/$currentDeviceMAC" -m "$percentage"
+
+				#set to percentage
+				userStatus[$index]="$percentage"
+
 				#delay default time
 				sleep $delaybetweenscan
 			done
 
-			/usr/bin/mosquitto_pub -h "$mqtt_address" -u "$mqtt_user" -P "$mqtt_password" -t "$mqtt_topicpath/$currentDeviceMAC" -m "$mqtt_away"
+			if [ "${userStatus[$index]}" == "0" ]; then 
+				/usr/bin/mosquitto_pub -h "$mqtt_address" -u "$mqtt_user" -P "$mqtt_password" -t "$mqtt_topicpath/$currentDeviceMAC" -m "0"
+			fi
 
 			#continue with scan list
 			sleep $delaybetweenscan
