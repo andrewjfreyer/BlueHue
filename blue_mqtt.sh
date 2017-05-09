@@ -16,7 +16,7 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=4.0.3
+Version=4.0.4
 
 #find the support directory
 support_directory="/home/pi/hue/support"
@@ -283,6 +283,10 @@ while (true); do
 		else
 			#user status			
 			status="${userStatus[$index]}"
+
+			if [ "$status" == "" ]; then 
+				$status = "0"
+			fi 
 
 			#should verify absense
 			for repetition in $(seq 1 $verifyrepetitions); 
