@@ -16,7 +16,7 @@
 # ----------------------------------------------------------------------------------------
 # BASH API / NOTIFICATION API INCLUDE
 # ----------------------------------------------------------------------------------------
-Version=4.0.5
+Version=4.0.6
 
 #find the support directory
 support_directory="/home/pi/hue/support"
@@ -284,12 +284,10 @@ while (true); do
 			#user status			
 			status="${userStatus[$index]}"
 
-			if [ "$status" == "" ]; then 
-				$status = "0"
+			if [ -z "$status" ]; then 
+				status="0"
 			fi 
-
-			echo "Status: $status"
-
+			
 			#should verify absense
 			for repetition in $(seq 1 $verifyrepetitions); 
 			do 
@@ -308,6 +306,11 @@ while (true); do
 					userStatus[$index]="100"
 					break
 				fi 
+
+				#if we have 0, then we know we haven't been found yet
+				if [ "${userStatus[$index]}" == "0"]; then 
+					break
+				fi  
 
 				#update percentage
 				userStatus[$index]="$percentage"
