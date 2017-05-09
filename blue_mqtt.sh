@@ -32,7 +32,7 @@ NOTIFICATIONSOURCE="$support_directory/notification_controller.sh" ; [ -f $NOTIF
 # Set Program Variables
 # ----------------------------------------------------------------------------------------
 
-delaybetweenscan=10		#advised for bluetooth hardware 
+delaybetweenscan=7		#advised for bluetooth hardware 
 verifyrepetitions=5 	#lower means more false rejection 
 
 
